@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escalas · Práctica de Guitarra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-panel: #14141c;
+    --bg-elev: #1d1d28;
+    --border: #2a2a38;
+    --wood: #2b1810;
+    --wood-light: #4a2c1a;
+    --fret: #b8a888;
+    --nut: #f0e6d2;
+    --string: #d4d4d8;
+    --string-thick: #a8a8b0;
+    --text: #e8e8ed;
+    --text-dim: #8e8e9e;
+    --text-mute: #55556a;
+    --root: #ff3d5a;
+    --scale: #00d9ff;
+    --scale-soft: rgba(0, 217, 255, 0.15);
+    --accent: #ffb800;
+    --inlay: rgba(240, 230, 210, 0.35);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; }
+
+  /* HEADER */
+  header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .title {
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .title .accent {
+    color: var(--root);
+    font-style: italic;
+    font-weight: 500;
+  }
+  .subtitle {
+    color: var(--text-dim);
+    margin-top: 6px;
+    font-size: 15px;
+  }
+
+  /* CONTROLS */
+  .controls {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 28px;
+    display: grid;
+    gap: 18px;
+  }
+  .control-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  .control-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    min-width: 90px;
+  }
+  .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .btn {
+    background: var(--bg-elev);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-width: 42px;
+  }
+  .btn:hover {
+    background: var(--border);
+    color: var(--text);
+  }
+  .btn.active {
+    background: var(--root);
+    color: #fff;
+    border-color: var(--root);
+  }
+  .btn.scale-btn.active { background: var(--scale); color: #003040; border-color: var(--scale); }
+  .btn.pos-btn.active { background: var(--accent); color: #2a1a00; border-color: var(--accent); }
+
+  .display-toggles {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-elev);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .toggle {
+    background: transparent;
+    color: var(--text-dim);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .toggle.active { background: var(--border); color: var(--text); }
+
+  /* INFO BAR */
+  .info-bar {
+    background: linear-gradient(135deg, var(--bg-panel) 0%, var(--bg-elev) 100%);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .scale-name {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .scale-name .root-note {
+    color: var(--root);
+    font-weight: 700;
+  }
+  .scale-notes {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+  .scale-notes .note {
+    color: var(--text);
+    padding: 2px 6px;
+    margin: 0 2px;
+    background: var(--bg);
+    border-radius: 4px;
+  }
+  .scale-notes .note.root { color: var(--root); border: 1px solid var(--root); }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 36px;
+  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .section-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  /* FRETBOARD */
+  .fretboard-wrap {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .fretboard-wrap svg {
+    display: block;
+    min-width: 100%;
+  }
+
+  /* TABS */
+  .tabs-wrap {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    overflow-x: auto;
+  }
+  .tab-block {
+    margin-bottom: 24px;
+  }
+  .tab-block:last-child { margin-bottom: 0; }
+  .tab-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 10px;
+  }
+  .tab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre;
+    background: var(--bg);
+    padding: 16px 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab .fret-num { color: var(--scale); font-weight: 700; }
+  .tab .fret-num.root { color: var(--root); }
+  .tab .string-name { color: var(--text-mute); }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 14px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot.root { background: var(--root); box-shadow: 0 0 8px rgba(255,61,90,0.5); }
+  .dot.scale { background: var(--scale); }
+  .dot.pos { background: var(--accent); }
+
+  /* DOCEROLA badge */
+  .doce-note {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text-dim);
+    display: none;
+  }
+  .doce-note.show { display: block; }
+  .doce-note strong { color: var(--accent); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    color: var(--text-mute);
+    font-size: 13px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  footer strong { color: var(--text-dim); }
+
+  @media (max-width: 640px) {
+    .control-label { min-width: 100%; margin-bottom: 4px; }
+    .info-bar { flex-direction: column; align-items: flex-start; }
+    .btn { padding: 7px 10px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1 class="title">Escalas <span class="accent">para guitarra</span></h1>
+  <p class="subtitle">Todas las escalas, todas las tónicas, mástil completo hasta el traste 22 · Guitarra eléctrica y docerola</p>
+</header>
+
+<!-- CONTROLS -->
+<section class="controls">
+  <div class="control-row">
+    <span class="control-label">Tónica</span>
+    <div class="btn-group" id="root-group"></div>
+  </div>
+  <div class="control-row">
+    <span class="control-label">Escala</span>
+    <div class="btn-group" id="scale-group"></div>
+  </div>
+  <div class="control-row">
+    <span class="control-label">Posición</span>
+    <div class="btn-group" id="position-group"></div>
+  </div>
+  <div class="control-row">
+    <span class="control-label">Ver</span>
+    <div class="display-toggles">
+      <button class="toggle active" data-display="notes">Notas</button>
+      <button class="toggle" data-display="degrees">Grados</button>
+    </div>
+    <span class="control-label" style="margin-left:16px">Instrumento</span>
+    <div class="display-toggles">
+      <button class="toggle active" data-inst="guitar">Guitarra</button>
+      <button class="toggle" data-inst="docerola">Docerola 12c</button>
+    </div>
+  </div>
+</section>
+
+<!-- SCALE INFO -->
+<div class="info-bar">
+  <div class="scale-name" id="scale-name">—</div>
+  <div class="scale-notes" id="scale-notes-list">—</div>
+</div>
+
+<div class="doce-note" id="doce-note">
+  <strong>Docerola / 12 cuerdas:</strong> Misma afinación que guitarra estándar (EADGBE) con cuerdas dobles. Las 4 cuerdas graves (E, A, D, G) están dobladas una octava arriba; las 2 agudas (B, e) al unísono. Toca las mismas posiciones — el sonido brillante es cortesía de las octavas.
+</div>
+
+<!-- FULL FRETBOARD -->
+<section class="section">
+  <div class="section-header">
+    <h2 class="section-title">Mástil completo · Todas las posiciones</h2>
+    <span class="section-hint">Trastes 0 → 22</span>
+  </div>
+  <div class="fretboard-wrap">
+    <svg id="fretboard-full" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><span class="dot root"></span> Tónica (raíz)</div>
+    <div class="legend-item"><span class="dot scale"></span> Notas de la escala</div>
+    <div class="legend-item"><span class="dot pos"></span> Posición seleccionada</div>
+  </div>
+</section>
+
+<!-- POSITION FRETBOARD -->
+<section class="section" id="position-section">
+  <div class="section-header">
+    <h2 class="section-title" id="position-title">Posición 1</h2>
+    <span class="section-hint" id="position-range">Trastes 0 – 4</span>
+  </div>
+  <div class="fretboard-wrap">
+    <svg id="fretboard-pos" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+</section>
+
+<!-- TABS -->
+<section class="section">
+  <div class="section-header">
+    <h2 class="section-title">Tablatura de la posición</h2>
+    <span class="section-hint">Ascendente y descendente</span>
+  </div>
+  <div class="tabs-wrap">
+    <div class="tab-block">
+      <div class="tab-label">↑ Ascendente</div>
+      <div class="tab" id="tab-up"></div>
+    </div>
+    <div class="tab-block">
+      <div class="tab-label">↓ Descendente</div>
+      <div class="tab" id="tab-down"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Práctica libre · Cambia tónica, escala y posición para ver todo actualizado al instante.</p>
+  <p style="margin-top:6px"><strong>Tip:</strong> Empieza siempre con la tónica (roja) para escuchar cómo suena la escala sobre su raíz.</p>
+</footer>
+
+</div>
+
+<script>
+// ============ MUSIC THEORY ============
+const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const NOTES_FLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+const SCALES = {
+  major:     { name: 'Mayor',              intervals: [0,2,4,5,7,9,11],  degrees: ['1','2','3','4','5','6','7'] },
+  minor:     { name: 'Menor natural',      intervals: [0,2,3,5,7,8,10],  degrees: ['1','2','b3','4','5','b6','b7'] },
+  pentMajor: { name: 'Pentatónica mayor',  intervals: [0,2,4,7,9],       degrees: ['1','2','3','5','6'] },
+  pentMinor: { name: 'Pentatónica menor',  intervals: [0,3,5,7,10],      degrees: ['1','b3','4','5','b7'] },
+  blues:     { name: 'Blues',              intervals: [0,3,5,6,7,10],    degrees: ['1','b3','4','b5','5','b7'] },
+};
+
+// Standard tuning EADGBE (low to high), stored as MIDI-like semitone from C
+// String index 0 = low E (6th string), 5 = high e (1st string)
+const TUNING = [4, 9, 2, 7, 11, 4]; // E A D G B E in semitones from C
+const STRING_LABELS = ['E', 'A', 'D', 'G', 'B', 'e'];
+const NUM_FRETS = 22;
+
+// Positions - defined as fret-range offsets from the root position on low E string
+// For pentatonic: 5 standard CAGED boxes
+// For diatonic: 5 CAGED-based positions
+const POSITION_OFFSETS_PENT = [
+  { name: 'Caja 1', offset: 0, span: 3 },
+  { name: 'Caja 2', offset: 2, span: 3 },
+  { name: 'Caja 3', offset: 4, span: 3 },
+  { name: 'Caja 4', offset: 7, span: 3 },
+  { name: 'Caja 5', offset: 9, span: 3 },
+];
+const POSITION_OFFSETS_DIA = [
+  { name: 'Posición 1', offset: 0, span: 4 },
+  { name: 'Posición 2', offset: 2, span: 4 },
+  { name: 'Posición 3', offset: 4, span: 4 },
+  { name: 'Posición 4', offset: 7, span: 4 },
+  { name: 'Posición 5', offset: 9, span: 4 },
+];
+
+// ============ STATE ============
+let state = {
+  root: 9,          // A
+  scale: 'pentMinor',
+  position: 0,      // 0 = all, 1-5 = box
+  display: 'notes', // notes | degrees
+  instrument: 'guitar',
+};
+
+// ============ HELPERS ============
+function noteAt(stringIdx, fret) { return (TUNING[stringIdx] + fret) % 12; }
+function getScaleNotes(root, scaleKey) { return SCALES[scaleKey].intervals.map(i => (root + i) % 12); }
+function isInScale(note, scaleNotes) { return scaleNotes.includes(note); }
+function getDegree(note, root, scaleKey) {
+  const s = SCALES[scaleKey];
+  const diff = (note - root + 12) % 12;
+  const idx = s.intervals.indexOf(diff);
+  return idx >= 0 ? s.degrees[idx] : null;
+}
+function noteName(n) { return NOTES[n]; }
+
+function getPositionsForScale(scaleKey) {
+  const isPent = scaleKey === 'pentMajor' || scaleKey === 'pentMinor' || scaleKey === 'blues';
+  return isPent ? POSITION_OFFSETS_PENT : POSITION_OFFSETS_DIA;
+}
+
+function getPositionRange(root, scaleKey, posIdx) {
+  const positions = getPositionsForScale(scaleKey);
+  const pos = positions[posIdx - 1];
+  // First occurrence of root on low E string (0-11)
+  const rootFret = (root - TUNING[0] + 12) % 12;
+  let start = rootFret + pos.offset;
+  // If the box goes past fret 22, shift it down an octave
+  while (start + pos.span > NUM_FRETS) start -= 12;
+  if (start < 0) start = 0;
+  return { start, end: start + pos.span, name: pos.name };
+}
+
+// ============ RENDER FRETBOARD ============
+function renderFretboard(svgEl, opts = {}) {
+  const { highlightRange = null, showAll = true } = opts;
+  const scaleNotes = getScaleNotes(state.root, state.scale);
+
+  const fretW = 52;
+  const nutW = 22;
+  const stringGap = 30;
+  const marginTop = 32;
+  const marginBot = 24;
+  const marginLeft = 42;
+  const marginRight = 20;
+
+  const width = marginLeft + nutW + fretW * NUM_FRETS + marginRight;
+  const height = marginTop + stringGap * 5 + marginBot;
+
+  svgEl.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svgEl.setAttribute('width', width);
+  svgEl.setAttribute('height', height);
+  svgEl.innerHTML = '';
+
+  // Fretboard background (wood)
+  const wood = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  wood.setAttribute('x', marginLeft + nutW);
+  wood.setAttribute('y', marginTop - 8);
+  wood.setAttribute('width', fretW * NUM_FRETS);
+  wood.setAttribute('height', stringGap * 5 + 16);
+  wood.setAttribute('fill', 'url(#woodGrad)');
+  wood.setAttribute('rx', 3);
+
+  // Gradient defs
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  defs.innerHTML = `
+    <linearGradient id="woodGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d2817"/>
+      <stop offset="50%" stop-color="#2b1810"/>
+      <stop offset="100%" stop-color="#1e100a"/>
+    </linearGradient>
+    <linearGradient id="nutGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e0d4b8"/>
+      <stop offset="100%" stop-color="#f5ead0"/>
+    </linearGradient>
+    <radialGradient id="rootGrad">
+      <stop offset="0%" stop-color="#ff6478"/>
+      <stop offset="100%" stop-color="#ff3d5a"/>
+    </radialGradient>
+    <radialGradient id="scaleGrad">
+      <stop offset="0%" stop-color="#4de5ff"/>
+      <stop offset="100%" stop-color="#00d9ff"/>
+    </radialGradient>
+    <radialGradient id="posGrad">
+      <stop offset="0%" stop-color="#ffcf40"/>
+      <stop offset="100%" stop-color="#ffb800"/>
+    </radialGradient>
+  `;
+  svgEl.appendChild(defs);
+  svgEl.appendChild(wood);
+
+  // Highlight range (position box)
+  if (highlightRange) {
+    const rangeStart = marginLeft + nutW + highlightRange.start * fretW;
+    const rangeEnd = marginLeft + nutW + highlightRange.end * fretW;
+    const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    highlight.setAttribute('x', rangeStart);
+    highlight.setAttribute('y', marginTop - 8);
+    highlight.setAttribute('width', rangeEnd - rangeStart);
+    highlight.setAttribute('height', stringGap * 5 + 16);
+    highlight.setAttribute('fill', 'rgba(255, 184, 0, 0.08)');
+    highlight.setAttribute('stroke', 'rgba(255, 184, 0, 0.4)');
+    highlight.setAttribute('stroke-width', '1.5');
+    highlight.setAttribute('stroke-dasharray', '4 4');
+    highlight.setAttribute('rx', 3);
+    svgEl.appendChild(highlight);
+  }
+
+  // Inlay dots
+  const singleInlays = [3, 5, 7, 9, 15, 17, 19, 21];
+  const doubleInlays = [12];
+  singleInlays.forEach(f => {
+    if (f > NUM_FRETS) return;
+    const cx = marginLeft + nutW + (f - 0.5) * fretW;
+    const cy = marginTop + stringGap * 2.5;
+    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', cx); dot.setAttribute('cy', cy); dot.setAttribute('r', 5);
+    dot.setAttribute('fill', 'rgba(240, 230, 210, 0.25)');
+    svgEl.appendChild(dot);
+  });
+  doubleInlays.forEach(f => {
+    if (f > NUM_FRETS) return;
+    const cx = marginLeft + nutW + (f - 0.5) * fretW;
+    [1.2, 3.8].forEach(y => {
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', cx);
+      dot.setAttribute('cy', marginTop + stringGap * y);
+      dot.setAttribute('r', 5);
+      dot.setAttribute('fill', 'rgba(240, 230, 210, 0.3)');
+      svgEl.appendChild(dot);
+    });
+  });
+
+  // Nut
+  const nut = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  nut.setAttribute('x', marginLeft);
+  nut.setAttribute('y', marginTop - 8);
+  nut.setAttribute('width', nutW);
+  nut.setAttribute('height', stringGap * 5 + 16);
+  nut.setAttribute('fill', 'url(#nutGrad)');
+  nut.setAttribute('rx', 2);
+  svgEl.appendChild(nut);
+
+  // Fret wires
+  for (let f = 1; f <= NUM_FRETS; f++) {
+    const x = marginLeft + nutW + f * fretW;
+    const wire = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    wire.setAttribute('x', x - 1.5);
+    wire.setAttribute('y', marginTop - 8);
+    wire.setAttribute('width', 3);
+    wire.setAttribute('height', stringGap * 5 + 16);
+    wire.setAttribute('fill', '#b8a888');
+    wire.setAttribute('rx', 1);
+    svgEl.appendChild(wire);
+  }
+
+  // Fret numbers
+  for (let f = 1; f <= NUM_FRETS; f++) {
+    const x = marginLeft + nutW + (f - 0.5) * fretW;
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', x);
+    t.setAttribute('y', marginTop - 14);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('fill', '#8e8e9e');
+    t.setAttribute('font-family', 'JetBrains Mono, monospace');
+    t.setAttribute('font-size', '11');
+    t.textContent = f;
+    svgEl.appendChild(t);
+  }
+
+  // Strings + labels
+  for (let s = 0; s < 6; s++) {
+    // string index in SVG: string 0 (low E) at the bottom visually
+    // Standard fretboard diagram convention: low E at top or bottom?
+    // We'll show high e at top (like looking at a chord chart) — string 5 (high e) at y = marginTop
+    // So visual row for state string s: y = marginTop + (5 - s) * stringGap
+    const y = marginTop + (5 - s) * stringGap;
+    const thickness = 1 + (5 - s) * 0.35; // low strings thicker
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', marginLeft);
+    line.setAttribute('x2', width - marginRight);
+    line.setAttribute('y1', y);
+    line.setAttribute('y2', y);
+    line.setAttribute('stroke', s < 3 ? '#a8a8b0' : '#e0e0e5');
+    line.setAttribute('stroke-width', thickness);
+    line.setAttribute('opacity', '0.85');
+    svgEl.appendChild(line);
+
+    // Label
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    lbl.setAttribute('x', marginLeft - 12);
+    lbl.setAttribute('y', y + 4);
+    lbl.setAttribute('text-anchor', 'end');
+    lbl.setAttribute('fill', '#8e8e9e');
+    lbl.setAttribute('font-family', 'JetBrains Mono, monospace');
+    lbl.setAttribute('font-size', '13');
+    lbl.setAttribute('font-weight', '700');
+    lbl.textContent = STRING_LABELS[s];
+    svgEl.appendChild(lbl);
+  }
+
+  // Notes on fretboard
+  for (let s = 0; s < 6; s++) {
+    for (let f = 0; f <= NUM_FRETS; f++) {
+      const note = noteAt(s, f);
+      if (!isInScale(note, scaleNotes)) continue;
+      const inRange = !highlightRange || (f >= highlightRange.start && f <= highlightRange.end);
+      if (!showAll && !inRange) continue;
+
+      const isRoot = note === state.root;
+      const y = marginTop + (5 - s) * stringGap;
+      const x = f === 0
+        ? marginLeft - 30  // open string marker
+        : marginLeft + nutW + (f - 0.5) * fretW;
+
+      const r = 12;
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', x);
+      circle.setAttribute('cy', y);
+      circle.setAttribute('r', r);
+      let fillColor;
+      if (highlightRange && inRange) {
+        fillColor = isRoot ? 'url(#rootGrad)' : 'url(#posGrad)';
+      } else {
+        fillColor = isRoot ? 'url(#rootGrad)' : 'url(#scaleGrad)';
+      }
+      circle.setAttribute('fill', fillColor);
+      circle.setAttribute('stroke', '#0a0a0f');
+      circle.setAttribute('stroke-width', '2');
+      if (isRoot) {
+        circle.setAttribute('filter', 'drop-shadow(0 0 4px rgba(255,61,90,0.6))');
+      }
+      // Dim notes outside range when highlighting
+      if (highlightRange && !inRange) {
+        circle.setAttribute('opacity', '0.25');
+      }
+      svgEl.appendChild(circle);
+
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', x);
+      label.setAttribute('y', y + 4);
+      label.setAttribute('text-anchor', 'middle');
+      label.setAttribute('fill', isRoot ? '#fff' : '#001a25');
+      label.setAttribute('font-family', 'Space Grotesk, sans-serif');
+      label.setAttribute('font-size', '11');
+      label.setAttribute('font-weight', '700');
+      if (highlightRange && !inRange) label.setAttribute('opacity', '0.4');
+      const txt = state.display === 'degrees'
+        ? getDegree(note, state.root, state.scale)
+        : noteName(note);
+      label.textContent = txt;
+      svgEl.appendChild(label);
+    }
+  }
+}
+
+// ============ RENDER TABS ============
+function renderTabs() {
+  const positions = getPositionsForScale(state.scale);
+  const posIdx = state.position === 0 ? 1 : state.position;
+  const range = getPositionRange(state.root, state.scale, posIdx);
+  const scaleNotes = getScaleNotes(state.root, state.scale);
+
+  // Gather notes in the position for each string
+  // string index 0 = low E, 5 = high e
+  const stringFrets = []; // [ [frets on E], [frets on A], ... ]
+  for (let s = 0; s < 6; s++) {
+    const frets = [];
+    for (let f = range.start; f <= range.end; f++) {
+      if (f < 0 || f > NUM_FRETS) continue;
+      const n = noteAt(s, f);
+      if (isInScale(n, scaleNotes)) frets.push(f);
+    }
+    stringFrets.push(frets);
+  }
+
+  // Build ascending sequence: from low E up to high e, each string in order
+  const sequenceUp = [];
+  for (let s = 0; s < 6; s++) {
+    stringFrets[s].forEach(f => sequenceUp.push({ string: s, fret: f }));
+  }
+  const sequenceDown = [...sequenceUp].reverse();
+
+  document.getElementById('tab-up').innerHTML = buildTabLines(sequenceUp);
+  document.getElementById('tab-down').innerHTML = buildTabLines(sequenceDown);
+}
+
+function buildTabLines(sequence) {
+  // 6 lines, string labels e B G D A E (top to bottom - high to low, tab convention)
+  // In tab, the high e is the top line, low E is the bottom line
+  const rows = [[], [], [], [], [], []]; // 0 = high e (top), 5 = low E (bottom)
+  const labels = ['e', 'B', 'G', 'D', 'A', 'E'];
+  // sequence uses state string idx (0 = low E, 5 = high e)
+  // Convert to tab row: tabRow = 5 - stringIdx
+  sequence.forEach(({ string, fret }) => {
+    const tabRow = 5 - string;
+    // Add fret to that row, pad others with —
+    const fretStr = String(fret).padStart(2, '-');
+    for (let r = 0; r < 6; r++) {
+      if (r === tabRow) {
+        rows[r].push(fretStr);
+      } else {
+        rows[r].push('--');
+      }
+    }
+  });
+
+  const scaleNotes = getScaleNotes(state.root, state.scale);
+  const lines = rows.map((row, i) => {
+    const stringIdx = 5 - i;
+    let line = `<span class="string-name">${labels[i]}|</span>`;
+    row.forEach(cell => {
+      if (cell === '--') {
+        line += '--';
+      } else {
+        const fretNum = parseInt(cell.replace('-', ''), 10);
+        const note = noteAt(stringIdx, fretNum);
+        const isRoot = note === state.root;
+        line += `<span class="fret-num${isRoot ? ' root' : ''}">${cell}</span>`;
+      }
+      line += '-';
+    });
+    line += '|';
+    return line;
+  });
+  return lines.join('\n');
+}
+
+// ============ RENDER SCALE INFO ============
+function renderInfo() {
+  const s = SCALES[state.scale];
+  const rootName = noteName(state.root);
+  document.getElementById('scale-name').innerHTML =
+    `<span class="root-note">${rootName}</span> ${s.name}`;
+
+  const notes = getScaleNotes(state.root, state.scale);
+  const notesList = notes.map((n, i) => {
+    const isRoot = n === state.root;
+    const label = state.display === 'degrees' ? s.degrees[i] : noteName(n);
+    return `<span class="note${isRoot ? ' root' : ''}">${label}</span>`;
+  }).join('');
+  document.getElementById('scale-notes-list').innerHTML = notesList;
+}
+
+// ============ RENDER POSITION SECTION ============
+function renderPositionSection() {
+  const positions = getPositionsForScale(state.scale);
+  const posIdx = state.position === 0 ? 1 : state.position;
+  const range = getPositionRange(state.root, state.scale, posIdx);
+  const pos = positions[posIdx - 1];
+  document.getElementById('position-title').textContent =
+    `${pos.name} · ${noteName(state.root)} ${SCALES[state.scale].name}`;
+  document.getElementById('position-range').textContent =
+    `Trastes ${range.start} – ${range.end}`;
+
+  renderFretboard(document.getElementById('fretboard-pos'), {
+    highlightRange: range,
+    showAll: false,
+  });
+}
+
+// ============ RENDER POSITION BUTTONS ============
+function renderPositionButtons() {
+  const positions = getPositionsForScale(state.scale);
+  const group = document.getElementById('position-group');
+  const isPent = state.scale === 'pentMajor' || state.scale === 'pentMinor' || state.scale === 'blues';
+  const label = isPent ? 'Caja' : 'Pos';
+  group.innerHTML = '';
+  positions.forEach((p, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn pos-btn' + (state.position === i + 1 ? ' active' : '');
+    btn.textContent = `${label} ${i + 1}`;
+    btn.onclick = () => { state.position = i + 1; renderAll(); };
+    group.appendChild(btn);
+  });
+}
+
+// ============ MASTER RENDER ============
+function renderAll() {
+  renderInfo();
+  renderPositionButtons();
+  renderFretboard(document.getElementById('fretboard-full'), { showAll: true });
+  renderPositionSection();
+  renderTabs();
+  updateActiveButtons();
+}
+
+function updateActiveButtons() {
+  document.querySelectorAll('#root-group .btn').forEach((b, i) => {
+    b.classList.toggle('active', i === state.root);
+  });
+  document.querySelectorAll('#scale-group .btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.scale === state.scale);
+  });
+  document.querySelectorAll('[data-display]').forEach(b => {
+    b.classList.toggle('active', b.dataset.display === state.display);
+  });
+  document.querySelectorAll('[data-inst]').forEach(b => {
+    b.classList.toggle('active', b.dataset.inst === state.instrument);
+  });
+  document.getElementById('doce-note').classList.toggle('show', state.instrument === 'docerola');
+}
+
+// ============ BUILD CONTROLS ============
+function buildControls() {
+  const rootGroup = document.getElementById('root-group');
+  NOTES.forEach((n, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn' + (i === state.root ? ' active' : '');
+    btn.textContent = n;
+    btn.onclick = () => { state.root = i; renderAll(); };
+    rootGroup.appendChild(btn);
+  });
+
+  const scaleGroup = document.getElementById('scale-group');
+  Object.entries(SCALES).forEach(([key, s]) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn scale-btn' + (key === state.scale ? ' active' : '');
+    btn.textContent = s.name;
+    btn.dataset.scale = key;
+    btn.onclick = () => {
+      state.scale = key;
+      // Reset position if out of range
+      const maxPos = getPositionsForScale(key).length;
+      if (state.position > maxPos) state.position = 1;
+      if (state.position === 0) state.position = 1;
+      renderAll();
+    };
+    scaleGroup.appendChild(btn);
+  });
+
+  document.querySelectorAll('[data-display]').forEach(btn => {
+    btn.onclick = () => { state.display = btn.dataset.display; renderAll(); };
+  });
+  document.querySelectorAll('[data-inst]').forEach(btn => {
+    btn.onclick = () => { state.instrument = btn.dataset.inst; updateActiveButtons(); };
+  });
+}
+
+// ============ INIT ============
+state.position = 1;
+buildControls();
+renderAll();
+</script>
+
+</body>
+</html>
