@@ -237,8 +237,8 @@
     </section>
 
     <section id="positions">
-      <h2>Posiciones por tramo de trastes</h2>
-      <p class="section-sub">El mismo mástil dividido en 7 posiciones de mano, empezando en los trastes 1&ndash;3 y avanzando hasta el 19&ndash;22.</p>
+      <h2>Posiciones de la escala</h2>
+      <p class="section-sub">Cada cuadro mide lo mismo y trae todas las notas de la escala dentro de sus trastes. La pentatónica tiene 5 posiciones; la mayor y la menor natural tienen 7. Van de los trastes bajos a los altos.</p>
       <div class="grid" id="positionsGrid"></div>
     </section>
 
@@ -258,7 +258,7 @@
         vuelo más rockero.</p>
         <p><strong>Guitarra de doce cuerdas:</strong> la afinación es la misma que la de seis cuerdas
         (Mi&ndash;La&ndash;Re&ndash;Sol&ndash;Si&ndash;Mi), solo que cada cuerda va en par. En las cuatro cuerdas
-        graves (Mi, La, Re, Sol) el par s½ toca en octavas; en Si y Mi agudo el par va al unísono. Las posiciones y
+        graves (Mi, La, Re, Sol) el par suena en octavas; en Si y Mi agudo el par va al unísono. Las posiciones y
         digitación de este mástil son idénticas en la docerola: simplemente pisas ambas cuerdas de cada par juntas.</p>
         <p>Rutina sugerida: metrónomo lento, una posición por día durante la semana, y los sábados enlazar las
         siete posiciones de corrido, de abajo hacia arriba y de regreso.</p>
@@ -327,7 +327,7 @@
     var marginL = opts.marginL, marginT = opts.marginT, marginB = opts.marginB, marginR = opts.marginR;
     var dotR = opts.dotR, noteFont = opts.noteFont, degFont = opts.degFont;
     var showDegree = opts.showDegree;
-    var showOpen = lowWire === 0;
+    var showOpen = opts.showOpen !== false && lowWire === 0;
     var openGap = showOpen ? fretW * 0.9 : 0;
     var numFrets = highWire - lowWire;
     var boardX0 = marginL + openGap;
@@ -427,20 +427,36 @@
     svg.id = 'fullBoard';
   }
 
+  // Una caja por cada nota de la escala: empieza en el traste donde cae ese grado
+  // en la cuerda Mi grave (un traste antes, para el dedo índice) y todas las cajas
+  // de una misma escala miden lo mismo.
+  function positionWindows(){
+    var s = SCALES[state.scale], n = s.intervals.length;
+    var span = (n === 5) ? 4 : 5;
+    var wins = s.intervals.map(function(iv){
+      var a = mod12(state.root + iv - STRINGS[5].open);
+      if (a < 2) a += 12;
+      return { lo: a - 1, hi: a - 1 + span };
+    });
+    wins.sort(function(x, y){ return x.lo - y.lo; });
+    return wins;
+  }
+
   function renderPositions(){
     var grid = document.getElementById('positionsGrid');
     grid.innerHTML = '';
-    WINDOWS.forEach(function(w, i){
+    positionWindows().forEach(function(w, i){
       var card = document.createElement('div');
       card.className = 'pos-card';
       var title = document.createElement('div');
       title.className = 'pos-title';
-      title.innerHTML = '<span>Posición ' + (i+1) + '</span><b>trastes ' + (w[0]+1) + '–' + w[1] + '</b>';
+      title.innerHTML = '<span>Posición ' + (i+1) + '</span><b>trastes ' + w.lo + '–' + w.hi + '</b>';
       card.appendChild(title);
       var svg = buildBoard({
-        lowWire:w[0], highWire:w[1], fretW:50, stringH:34,
+        lowWire:w.lo - 1, highWire:w.hi, fretW:50, stringH:34,
         marginL:38, marginT:14, marginB:52, marginR:14,
         dotR:13, noteFont:10.5, degFont:9, showDegree:true,
+        showOpen:false,
         instrument: state.instrument
       });
       card.appendChild(svg);
