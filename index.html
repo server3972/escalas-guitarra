@@ -1,899 +1,843 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Escalas · Práctica de Guitarra</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Taller de Guitarra</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --bg-panel: #14141c;
-    --bg-elev: #1d1d28;
-    --border: #2a2a38;
-    --wood: #2b1810;
-    --wood-light: #4a2c1a;
-    --fret: #b8a888;
-    --nut: #f0e6d2;
-    --string: #d4d4d8;
-    --string-thick: #a8a8b0;
-    --text: #e8e8ed;
-    --text-dim: #8e8e9e;
-    --text-mute: #55556a;
-    --root: #ff3d5a;
-    --scale: #00d9ff;
-    --scale-soft: rgba(0, 217, 255, 0.15);
-    --accent: #ffb800;
-    --inlay: rgba(240, 230, 210, 0.35);
-  }
+/* Layout: mástil de guitarra. Cabecera con cuerdas y trastes, navegación fija, módulos como cuerdas de práctica, metrónomo fijo abajo. */
+:root{
+  --bg:#E8E4DB; --surface:#F3F1EB; --line:#CDC6B8; --ink:#1F1A15; --mute:#6A6154;
+  --accent:#8C6516; --accent-ink:#FFF8E7; --string:#B9B0A0;
+  --f-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15110E; --surface:#201A15; --line:#3A3027; --ink:#EAE5D9; --mute:#A39887;
+  --accent:#D2A94E; --accent-ink:#1A1409; --string:#4A3F34; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15110E; --surface:#201A15; --line:#3A3027; --ink:#EAE5D9; --mute:#A39887;
+  --accent:#D2A94E; --accent-ink:#1A1409; --string:#4A3F34; color-scheme:dark}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg); color:var(--ink); font:16px/1.55 var(--f-body);
+  padding-block:0 96px;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+  margin:0;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+.wrap{max-width:720px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;line-height:1.1}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    line-height: 1.5;
-    min-height: 100vh;
-    padding: 24px 16px 60px;
-  }
+/* Cabecera */
+.hero{padding-block:28px 18px}
+.neck{
+  height:74px;border-radius:6px;border:1px solid var(--line);position:relative;overflow:hidden;
+  background:
+    repeating-linear-gradient(to bottom,transparent 0 11px,var(--string) 11px 12px),
+    repeating-linear-gradient(to right,transparent 0 79px,var(--line) 79px 81px),
+    var(--surface);
+  background-position:0 6px,0 0,0 0;
+}
+.neck i{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:var(--ink);opacity:.14;transform:translateY(-50%)}
+.hero h1{font-size:clamp(2.1rem,9vw,3.2rem);font-weight:800;margin-top:20px;letter-spacing:-.02em}
+.hero p{margin:8px 0 0;color:var(--mute);max-width:46ch}
+.total{margin-top:18px;display:flex;align-items:center;gap:12px}
+.bar{flex:1;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar b{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.total span{font:500 .85rem var(--f-mono);color:var(--mute);white-space:nowrap}
 
-  .container { max-width: 1400px; margin: 0 auto; }
+/* Navegación */
+nav{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);
+  display:flex;gap:6px;padding-block:8px;border-bottom:1px solid var(--line);
+}
+nav a{
+  flex:1;text-align:center;text-decoration:none;color:var(--mute);font-weight:600;font-size:.95rem;
+  padding:10px 6px;border-radius:8px;border:1px solid transparent;
+}
+nav a[aria-current="page"]{color:var(--accent-ink);background:var(--accent)}
 
-  /* HEADER */
-  header {
-    margin-bottom: 32px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--border);
-  }
-  .title {
-    font-size: clamp(28px, 5vw, 44px);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
-  }
-  .title .accent {
-    color: var(--root);
-    font-style: italic;
-    font-weight: 500;
-  }
-  .subtitle {
-    color: var(--text-dim);
-    margin-top: 6px;
-    font-size: 15px;
-  }
+section.view{padding-block:22px}
+.lead{color:var(--mute);margin:0 0 20px;max-width:56ch}
 
-  /* CONTROLS */
-  .controls {
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 28px;
-    display: grid;
-    gap: 18px;
-  }
-  .control-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-  }
-  .control-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--text-mute);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    min-width: 90px;
-  }
-  .btn-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  .btn {
-    background: var(--bg-elev);
-    color: var(--text-dim);
-    border: 1px solid var(--border);
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    min-width: 42px;
-  }
-  .btn:hover {
-    background: var(--border);
-    color: var(--text);
-  }
-  .btn.active {
-    background: var(--root);
-    color: #fff;
-    border-color: var(--root);
-  }
-  .btn.scale-btn.active { background: var(--scale); color: #003040; border-color: var(--scale); }
-  .btn.pos-btn.active { background: var(--accent); color: #2a1a00; border-color: var(--accent); }
+/* Módulos */
+.mod{margin-bottom:30px}
+.mod-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:6px}
+.mod h2{font-size:1.45rem;font-weight:800;letter-spacing:-.01em}
+.mod .count{font:500 .85rem var(--f-mono);color:var(--mute);white-space:nowrap}
+.mod .sub{margin:0 0 10px;color:var(--mute);font-size:.95rem}
+.mod .bar{height:4px;margin-bottom:12px}
 
-  .display-toggles {
-    display: flex;
-    gap: 4px;
-    background: var(--bg-elev);
-    padding: 4px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-  }
-  .toggle {
-    background: transparent;
-    color: var(--text-dim);
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .toggle.active { background: var(--border); color: var(--text); }
+details.ex{border-top:1px solid var(--line)}
+details.ex:last-child{border-bottom:1px solid var(--line)}
+details.ex summary{
+  list-style:none;display:flex;align-items:center;gap:12px;padding:13px 0;cursor:pointer;
+}
+details.ex summary::-webkit-details-marker{display:none}
+.tick{
+  flex:none;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:transparent;
+  display:grid;place-items:center;padding:0;color:var(--accent-ink);
+}
+.tick svg{width:16px;height:16px;opacity:0}
+.tick[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+.tick[aria-pressed="true"] svg{opacity:1}
+.ex-title{flex:1;min-width:0;font-weight:600;line-height:1.3}
+.chip{flex:none;font:500 .75rem var(--f-mono);color:var(--mute);border:1px solid var(--line);border-radius:6px;padding:3px 7px}
+.chev{flex:none;width:10px;height:10px;border-right:2px solid var(--mute);border-bottom:2px solid var(--mute);transform:rotate(45deg);transition:transform .2s;margin-right:4px}
+details[open] .chev{transform:rotate(-135deg)}
+.ex-body{padding:2px 0 20px 42px;display:grid;gap:12px}
+.ex-body p{margin:0}
+.goal{color:var(--ink)}
+.ex-body ol{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.ex-body li::marker{color:var(--accent);font-weight:600}
+pre.tab{
+  margin:0;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  font:400 .8rem/1.35 var(--f-mono);overflow-x:auto;max-width:100%;white-space:pre;
+}
+.tab-note{font-size:.82rem;color:var(--mute)}
+.ex-body a:not(.btn){color:var(--accent);text-underline-offset:3px}
+.btn{
+  align-self:start;border:1px solid var(--accent);color:var(--accent);background:transparent;
+  border-radius:8px;padding:8px 14px;font-weight:600;font-size:.9rem;
+}
+.btn:hover{background:var(--accent);color:var(--accent-ink)}
+.btn.solid{background:var(--accent);color:var(--accent-ink)}
 
-  /* INFO BAR */
-  .info-bar {
-    background: linear-gradient(135deg, var(--bg-panel) 0%, var(--bg-elev) 100%);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px 22px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .scale-name {
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
-  .scale-name .root-note {
-    color: var(--root);
-    font-weight: 700;
-  }
-  .scale-notes {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
-    color: var(--text-dim);
-    letter-spacing: 0.05em;
-  }
-  .scale-notes .note {
-    color: var(--text);
-    padding: 2px 6px;
-    margin: 0 2px;
-    background: var(--bg);
-    border-radius: 4px;
-  }
-  .scale-notes .note.root { color: var(--root); border: 1px solid var(--root); }
+/* Escalas */
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:18px}
+.controls label{font-weight:600;font-size:.9rem;color:var(--mute);display:flex;align-items:center;gap:8px}
+select{
+  font:600 1rem var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);
+  border-radius:8px;padding:8px 10px;
+}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:8px 14px;font-weight:600;color:var(--mute)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.boxes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.boxcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 10px 8px;min-width:0}
+.boxcard h3{font-size:.95rem;font-weight:600;font-family:var(--f-body);margin-bottom:4px;display:flex;justify-content:space-between;gap:6px}
+.boxcard h3 span{font:500 .75rem var(--f-mono);color:var(--mute)}
+.boxcard svg{width:100%;height:auto;display:block}
+svg .fr{stroke:var(--line);stroke-width:1}
+svg .nut{stroke:var(--ink);stroke-width:3}
+svg .st{stroke:var(--string);stroke-width:1.2}
+svg .dot{fill:var(--ink)}
+svg .root{fill:var(--accent)}
+svg .dn{font:500 8px var(--f-mono);text-anchor:middle}
+svg .dn.d{fill:var(--bg)}
+svg .dn.r{fill:var(--accent-ink)}
+svg .bl{font:500 9px var(--f-mono);fill:var(--mute)}
+svg .sn{font:500 8px var(--f-mono);fill:var(--mute);text-anchor:middle}
+.legend{margin-top:14px;color:var(--mute);font-size:.9rem}
 
-  /* SECTION */
-  .section {
-    margin-bottom: 36px;
-  }
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .section-title {
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
-  .section-hint {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--text-mute);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-  }
+/* Pista de acompañamiento */
+.track{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:20px;display:grid;gap:14px}
+.track-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px 12px;flex-wrap:wrap}
+.track h2{font-size:1.2rem;font-weight:800}
+.track-head span{font:500 .8rem var(--f-mono);color:var(--mute)}
+.progs{display:flex;flex-wrap:wrap;gap:8px}
+.progs button{border:1px solid var(--line);background:transparent;border-radius:8px;padding:8px 12px;font-weight:600;font-size:.9rem;text-align:left;line-height:1.25}
+.progs button small{display:block;font:500 .72rem var(--f-mono);color:var(--mute)}
+.progs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.progs button[aria-pressed="true"] small{color:var(--accent-ink);opacity:.85}
+.chords{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.chord{border:1px solid var(--line);border-radius:10px;padding:12px 4px;text-align:center;font:800 1.35rem var(--f-display);background:var(--bg)}
+.chord.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.track-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+.chk{display:flex;align-items:center;gap:6px;font-weight:600;font-size:.9rem}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+.vol{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.9rem;color:var(--mute)}
+.vol input{width:110px;accent-color:var(--accent)}
+.tip{margin:0;color:var(--mute);font-size:.9rem}
+.boxcard .mini{margin:0 0 8px;border:1px solid var(--line);background:transparent;border-radius:6px;padding:4px 9px;font-weight:600;font-size:.8rem;color:var(--accent)}
+.boxcard .mini:hover{border-color:var(--accent)}
 
-  /* FRETBOARD */
-  .fretboard-wrap {
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .fretboard-wrap svg {
-    display: block;
-    min-width: 100%;
-  }
+/* Relativas */
+.relgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.relcard{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--bg);display:grid;gap:8px;min-width:0;align-content:start}
+.relcard h3{font:600 .78rem var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.relrow{display:grid;gap:6px;padding:8px 10px;border:1px solid transparent;border-radius:8px}
+.relrow.sel{border-color:var(--accent)}
+.relrow b{font-size:.95rem}
+.notes{display:flex;flex-wrap:wrap;gap:6px}
+.notes i{font:500 .9rem var(--f-mono);padding:3px 7px;border:1px solid var(--line);border-radius:6px}
+.notes i.r{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+details.reltable summary{cursor:pointer;font-weight:600;color:var(--accent)}
+.tbl{overflow-x:auto;margin-top:10px}
+.tbl table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:300px}
+.tbl th,.tbl td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line)}
+.tbl th{color:var(--mute);font-weight:600;font-size:.8rem}
 
-  /* TABS */
-  .tabs-wrap {
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 22px;
-    overflow-x: auto;
-  }
-  .tab-block {
-    margin-bottom: 24px;
-  }
-  .tab-block:last-child { margin-bottom: 0; }
-  .tab-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin-bottom: 10px;
-  }
-  .tab {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--text);
-    white-space: pre;
-    background: var(--bg);
-    padding: 16px 20px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    overflow-x: auto;
-  }
-  .tab .fret-num { color: var(--scale); font-weight: 700; }
-  .tab .fret-num.root { color: var(--root); }
-  .tab .string-name { color: var(--text-mute); }
+/* Rutinas */
+.routine{border:1px solid var(--line);border-radius:12px;background:var(--surface);margin-bottom:18px;overflow:hidden}
+.routine header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.routine h2{font-size:1.25rem;font-weight:800}
+.routine header span{font:500 .8rem var(--f-mono);color:var(--mute)}
+.routine ul{list-style:none;margin:0;padding:0}
+.routine li{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--line)}
+.routine li:first-child{border-top:0}
+.routine .min{flex:none;width:3.4em;font:500 .85rem var(--f-mono);color:var(--accent)}
+.routine .what{flex:1;min-width:0}
+.routine .what b{display:block;font-weight:600}
+.routine .what a{font-size:.85rem;color:var(--mute);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.go{flex:none;border:1px solid var(--line);background:transparent;border-radius:8px;padding:7px 11px;font-weight:600;font-size:.85rem}
+.go:hover{border-color:var(--accent);color:var(--accent)}
 
-  /* LEGEND */
-  .legend {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 14px;
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    margin-top: 14px;
-    font-size: 13px;
-    color: var(--text-dim);
-  }
-  .legend-item { display: flex; align-items: center; gap: 8px; }
-  .dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-  .dot.root { background: var(--root); box-shadow: 0 0 8px rgba(255,61,90,0.5); }
-  .dot.scale { background: var(--scale); }
-  .dot.pos { background: var(--accent); }
-
-  /* DOCEROLA badge */
-  .doce-note {
-    background: var(--bg-elev);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-top: 12px;
-    font-size: 13px;
-    color: var(--text-dim);
-    display: none;
-  }
-  .doce-note.show { display: block; }
-  .doce-note strong { color: var(--accent); }
-
-  /* FOOTER */
-  footer {
-    text-align: center;
-    color: var(--text-mute);
-    font-size: 13px;
-    margin-top: 40px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-  }
-  footer strong { color: var(--text-dim); }
-
-  @media (max-width: 640px) {
-    .control-label { min-width: 100%; margin-bottom: 4px; }
-    .info-bar { flex-direction: column; align-items: flex-start; }
-    .btn { padding: 7px 10px; font-size: 13px; }
-  }
+/* Dock */
+.dock{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);
+  padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+.dock-in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.play{
+  flex:none;width:46px;height:46px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);
+  display:grid;place-items:center;
+}
+.play svg{width:20px;height:20px}
+.bpmbox{display:flex;align-items:center;gap:6px}
+.step{width:38px;height:38px;border-radius:8px;border:1px solid var(--line);background:transparent;font-size:1.2rem;font-weight:600}
+.bpmnum{min-width:4.2ch;text-align:center;font:500 1.35rem var(--f-mono);line-height:1}
+.bpmnum small{display:block;font-size:.6rem;letter-spacing:.12em;color:var(--mute);margin-top:3px}
+.beats{display:flex;gap:5px;margin-left:2px}
+.beats i{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.beats i.on{background:var(--accent)}
+.timer{
+  margin-left:auto;display:none;align-items:center;gap:8px;border:1px solid var(--accent);border-radius:8px;
+  background:transparent;padding:6px 10px;text-align:left;
+}
+.timer.show{display:flex}
+.timer b{font:500 1.15rem var(--f-mono)}
+.timer small{display:block;color:var(--mute);font-size:.7rem;max-width:11ch;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:420px){.beats{display:none}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.bar b,.chev{transition:none}}
 </style>
-</head>
-<body>
-<div class="container">
 
-<header>
-  <h1 class="title">Escalas <span class="accent">para guitarra</span></h1>
-  <p class="subtitle">Todas las escalas, todas las tónicas, mástil completo hasta el traste 22 · Guitarra eléctrica y docerola</p>
-</header>
+<div class="wrap">
+  <header class="hero">
+    <div class="neck" aria-hidden="true"><i style="left:19%"></i><i style="left:44%"></i><i style="left:69%"></i></div>
+    <h1>Taller de Guitarra</h1>
+    <p>Curso intermedio con técnica, escalas, improvisación, estilo sierreño, rock melódico instrumental y tono con efectos. Cada ejercicio trae su meta de tempo, así que practicas con el metrónomo de abajo.</p>
+    <div class="total"><div class="bar"><b id="totalbar"></b></div><span id="totaltxt">0 de 0</span></div>
+  </header>
 
-<!-- CONTROLS -->
-<section class="controls">
-  <div class="control-row">
-    <span class="control-label">Tónica</span>
-    <div class="btn-group" id="root-group"></div>
-  </div>
-  <div class="control-row">
-    <span class="control-label">Escala</span>
-    <div class="btn-group" id="scale-group"></div>
-  </div>
-  <div class="control-row">
-    <span class="control-label">Posición</span>
-    <div class="btn-group" id="position-group"></div>
-  </div>
-  <div class="control-row">
-    <span class="control-label">Ver</span>
-    <div class="display-toggles">
-      <button class="toggle active" data-display="notes">Notas</button>
-      <button class="toggle" data-display="degrees">Grados</button>
+  <nav aria-label="Secciones">
+    <a href="#curso" data-v="curso">Curso</a>
+    <a href="#escalas" data-v="escalas">Escalas</a>
+    <a href="#rutinas" data-v="rutinas">Rutinas</a>
+  </nav>
+
+  <section class="view" id="v-curso">
+    <p class="lead">Ve en orden o salta al módulo que necesites. Donde veas el botón Escuchar, tócalo para oír cómo debe sonar a tu tempo. Toca el círculo para marcar un ejercicio como dominado; tu avance queda guardado en este teléfono.</p>
+    <div id="modules"></div>
+  </section>
+
+  <section class="view" id="v-escalas" hidden>
+    <p class="lead">Elige el tono y el modo, pon la pista de acordes y practica las cinco posiciones de la pentatónica encima. Los puntos dorados son la nota raíz. Cuerdas de izquierda a derecha: 6ª (mi grave) a 1ª (mi agudo).</p>
+    <div class="controls">
+      <label for="key">Tono
+        <select id="key"></select>
+      </label>
+      <div class="seg" role="group" aria-label="Modo">
+        <button id="m-menor" aria-pressed="true">Menor</button>
+        <button id="m-mayor" aria-pressed="false">Mayor</button>
+      </div>
     </div>
-    <span class="control-label" style="margin-left:16px">Instrumento</span>
-    <div class="display-toggles">
-      <button class="toggle active" data-inst="guitar">Guitarra</button>
-      <button class="toggle" data-inst="docerola">Docerola 12c</button>
+    <div class="track" id="track">
+      <div class="track-head"><h2>Pista para solear</h2><span id="tinfo">80 BPM</span></div>
+      <div class="progs" id="progs" role="group" aria-label="Progresión de acordes"></div>
+      <div class="chords" id="chords"></div>
+      <div class="track-ctl">
+        <button class="btn solid" id="tplay">Tocar pista</button>
+        <label class="chk" for="tdrums"><input type="checkbox" id="tdrums" checked>Batería</label>
+        <label class="chk" for="tbass"><input type="checkbox" id="tbass" checked>Bajo</label>
+        <label class="vol" for="tvol">Volumen<input type="range" id="tvol" min="0" max="1" step="0.05" value="0.8"></label>
+      </div>
+      <p class="tip" id="ttip"></p>
     </div>
-  </div>
-</section>
+    <div class="track" id="rel">
+      <div class="track-head"><h2>Escalas relativas</h2><span>mismas notas, otra casa</span></div>
+      <div class="relgrid" id="relgrid"></div>
+      <p class="tip" id="reltip"></p>
+      <details class="reltable">
+        <summary>Tabla de todas las relativas</summary>
+        <div class="tbl"><table id="reltbl"></table></div>
+      </details>
+    </div>
+    <div class="boxes" id="boxes"></div>
+    <p class="legend" id="legend"></p>
+  </section>
 
-<!-- SCALE INFO -->
-<div class="info-bar">
-  <div class="scale-name" id="scale-name">—</div>
-  <div class="scale-notes" id="scale-notes-list">—</div>
+  <section class="view" id="v-rutinas" hidden>
+    <p class="lead">Elige según el tiempo que tengas. Toca “Iniciar” para correr el cronómetro de ese bloque; el metrónomo sigue sonando abajo.</p>
+    <div id="routines"></div>
+  </section>
 </div>
 
-<div class="doce-note" id="doce-note">
-  <strong>Docerola / 12 cuerdas:</strong> Misma afinación que guitarra estándar (EADGBE) con cuerdas dobles. Las 4 cuerdas graves (E, A, D, G) están dobladas una octava arriba; las 2 agudas (B, e) al unísono. Toca las mismas posiciones — el sonido brillante es cortesía de las octavas.
-</div>
-
-<!-- FULL FRETBOARD -->
-<section class="section">
-  <div class="section-header">
-    <h2 class="section-title">Mástil completo · Todas las posiciones</h2>
-    <span class="section-hint">Trastes 0 → 22</span>
-  </div>
-  <div class="fretboard-wrap">
-    <svg id="fretboard-full" xmlns="http://www.w3.org/2000/svg"></svg>
-  </div>
-  <div class="legend">
-    <div class="legend-item"><span class="dot root"></span> Tónica (raíz)</div>
-    <div class="legend-item"><span class="dot scale"></span> Notas de la escala</div>
-    <div class="legend-item"><span class="dot pos"></span> Posición seleccionada</div>
-  </div>
-</section>
-
-<!-- POSITION FRETBOARD -->
-<section class="section" id="position-section">
-  <div class="section-header">
-    <h2 class="section-title" id="position-title">Posición 1</h2>
-    <span class="section-hint" id="position-range">Trastes 0 – 4</span>
-  </div>
-  <div class="fretboard-wrap">
-    <svg id="fretboard-pos" xmlns="http://www.w3.org/2000/svg"></svg>
-  </div>
-</section>
-
-<!-- TABS -->
-<section class="section">
-  <div class="section-header">
-    <h2 class="section-title">Tablatura de la posición</h2>
-    <span class="section-hint">Ascendente y descendente</span>
-  </div>
-  <div class="tabs-wrap">
-    <div class="tab-block">
-      <div class="tab-label">↑ Ascendente</div>
-      <div class="tab" id="tab-up"></div>
+<div class="dock" role="region" aria-label="Metrónomo">
+  <div class="dock-in">
+    <button class="play" id="play" aria-label="Iniciar metrónomo">
+      <svg viewBox="0 0 24 24" fill="currentColor" id="playicon"><path d="M7 4.5v15l13-7.5z"/></svg>
+    </button>
+    <div class="bpmbox">
+      <button class="step" id="dn" aria-label="Bajar 5 bpm">−</button>
+      <div class="bpmnum"><span id="bpm">80</span><small>BPM</small></div>
+      <button class="step" id="up" aria-label="Subir 5 bpm">+</button>
     </div>
-    <div class="tab-block">
-      <div class="tab-label">↓ Descendente</div>
-      <div class="tab" id="tab-down"></div>
-    </div>
+    <div class="beats" id="beats" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <button class="timer" id="timer" aria-label="Cancelar cronómetro"><div><b id="tleft">00:00</b><small id="tlabel"></small></div></button>
   </div>
-</section>
-
-<footer>
-  <p>Práctica libre · Cambia tónica, escala y posición para ver todo actualizado al instante.</p>
-  <p style="margin-top:6px"><strong>Tip:</strong> Empieza siempre con la tónica (roja) para escuchar cómo suena la escala sobre su raíz.</p>
-</footer>
-
 </div>
 
 <script>
-// ============ MUSIC THEORY ============
-const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const NOTES_FLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-
-const SCALES = {
-  major:     { name: 'Mayor',              intervals: [0,2,4,5,7,9,11],  degrees: ['1','2','3','4','5','6','7'] },
-  minor:     { name: 'Menor natural',      intervals: [0,2,3,5,7,8,10],  degrees: ['1','2','b3','4','5','b6','b7'] },
-  pentMajor: { name: 'Pentatónica mayor',  intervals: [0,2,4,7,9],       degrees: ['1','2','3','5','6'] },
-  pentMinor: { name: 'Pentatónica menor',  intervals: [0,3,5,7,10],      degrees: ['1','b3','4','5','b7'] },
-  blues:     { name: 'Blues',              intervals: [0,3,5,6,7,10],    degrees: ['1','b3','4','b5','5','b7'] },
-};
-
-// Standard tuning EADGBE (low to high), stored as MIDI-like semitone from C
-// String index 0 = low E (6th string), 5 = high e (1st string)
-const TUNING = [4, 9, 2, 7, 11, 4]; // E A D G B E in semitones from C
-const STRING_LABELS = ['E', 'A', 'D', 'G', 'B', 'e'];
-const NUM_FRETS = 22;
-
-// Positions - defined as fret-range offsets from the root position on low E string
-// For pentatonic: 5 standard CAGED boxes
-// For diatonic: 5 CAGED-based positions
-const POSITION_OFFSETS_PENT = [
-  { name: 'Caja 1', offset: 0, span: 3 },
-  { name: 'Caja 2', offset: 2, span: 3 },
-  { name: 'Caja 3', offset: 4, span: 3 },
-  { name: 'Caja 4', offset: 7, span: 3 },
-  { name: 'Caja 5', offset: 9, span: 3 },
-];
-const POSITION_OFFSETS_DIA = [
-  { name: 'Posición 1', offset: 0, span: 4 },
-  { name: 'Posición 2', offset: 2, span: 4 },
-  { name: 'Posición 3', offset: 4, span: 4 },
-  { name: 'Posición 4', offset: 7, span: 4 },
-  { name: 'Posición 5', offset: 9, span: 4 },
-];
-
-// ============ STATE ============
-let state = {
-  root: 9,          // A
-  scale: 'pentMinor',
-  position: 0,      // 0 = all, 1-5 = box
-  display: 'notes', // notes | degrees
-  instrument: 'guitar',
-};
-
-// ============ HELPERS ============
-function noteAt(stringIdx, fret) { return (TUNING[stringIdx] + fret) % 12; }
-function getScaleNotes(root, scaleKey) { return SCALES[scaleKey].intervals.map(i => (root + i) % 12); }
-function isInScale(note, scaleNotes) { return scaleNotes.includes(note); }
-function getDegree(note, root, scaleKey) {
-  const s = SCALES[scaleKey];
-  const diff = (note - root + 12) % 12;
-  const idx = s.intervals.indexOf(diff);
-  return idx >= 0 ? s.degrees[idx] : null;
-}
-function noteName(n) { return NOTES[n]; }
-
-function getPositionsForScale(scaleKey) {
-  const isPent = scaleKey === 'pentMajor' || scaleKey === 'pentMinor' || scaleKey === 'blues';
-  return isPent ? POSITION_OFFSETS_PENT : POSITION_OFFSETS_DIA;
-}
-
-function getPositionRange(root, scaleKey, posIdx) {
-  const positions = getPositionsForScale(scaleKey);
-  const pos = positions[posIdx - 1];
-  // First occurrence of root on low E string (0-11)
-  const rootFret = (root - TUNING[0] + 12) % 12;
-  let start = rootFret + pos.offset;
-  // If the box goes past fret 22, shift it down an octave
-  while (start + pos.span > NUM_FRETS) start -= 12;
-  if (start < 0) start = 0;
-  return { start, end: start + pos.span, name: pos.name };
-}
-
-// ============ RENDER FRETBOARD ============
-function renderFretboard(svgEl, opts = {}) {
-  const { highlightRange = null, showAll = true } = opts;
-  const scaleNotes = getScaleNotes(state.root, state.scale);
-
-  const fretW = 52;
-  const nutW = 22;
-  const stringGap = 30;
-  const marginTop = 32;
-  const marginBot = 24;
-  const marginLeft = 42;
-  const marginRight = 20;
-
-  const width = marginLeft + nutW + fretW * NUM_FRETS + marginRight;
-  const height = marginTop + stringGap * 5 + marginBot;
-
-  svgEl.setAttribute('viewBox', `0 0 ${width} ${height}`);
-  svgEl.setAttribute('width', width);
-  svgEl.setAttribute('height', height);
-  svgEl.innerHTML = '';
-
-  // Fretboard background (wood)
-  const wood = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-  wood.setAttribute('x', marginLeft + nutW);
-  wood.setAttribute('y', marginTop - 8);
-  wood.setAttribute('width', fretW * NUM_FRETS);
-  wood.setAttribute('height', stringGap * 5 + 16);
-  wood.setAttribute('fill', 'url(#woodGrad)');
-  wood.setAttribute('rx', 3);
-
-  // Gradient defs
-  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-  defs.innerHTML = `
-    <linearGradient id="woodGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#3d2817"/>
-      <stop offset="50%" stop-color="#2b1810"/>
-      <stop offset="100%" stop-color="#1e100a"/>
-    </linearGradient>
-    <linearGradient id="nutGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#e0d4b8"/>
-      <stop offset="100%" stop-color="#f5ead0"/>
-    </linearGradient>
-    <radialGradient id="rootGrad">
-      <stop offset="0%" stop-color="#ff6478"/>
-      <stop offset="100%" stop-color="#ff3d5a"/>
-    </radialGradient>
-    <radialGradient id="scaleGrad">
-      <stop offset="0%" stop-color="#4de5ff"/>
-      <stop offset="100%" stop-color="#00d9ff"/>
-    </radialGradient>
-    <radialGradient id="posGrad">
-      <stop offset="0%" stop-color="#ffcf40"/>
-      <stop offset="100%" stop-color="#ffb800"/>
-    </radialGradient>
-  `;
-  svgEl.appendChild(defs);
-  svgEl.appendChild(wood);
-
-  // Highlight range (position box)
-  if (highlightRange) {
-    const rangeStart = marginLeft + nutW + highlightRange.start * fretW;
-    const rangeEnd = marginLeft + nutW + highlightRange.end * fretW;
-    const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    highlight.setAttribute('x', rangeStart);
-    highlight.setAttribute('y', marginTop - 8);
-    highlight.setAttribute('width', rangeEnd - rangeStart);
-    highlight.setAttribute('height', stringGap * 5 + 16);
-    highlight.setAttribute('fill', 'rgba(255, 184, 0, 0.08)');
-    highlight.setAttribute('stroke', 'rgba(255, 184, 0, 0.4)');
-    highlight.setAttribute('stroke-width', '1.5');
-    highlight.setAttribute('stroke-dasharray', '4 4');
-    highlight.setAttribute('rx', 3);
-    svgEl.appendChild(highlight);
-  }
-
-  // Inlay dots
-  const singleInlays = [3, 5, 7, 9, 15, 17, 19, 21];
-  const doubleInlays = [12];
-  singleInlays.forEach(f => {
-    if (f > NUM_FRETS) return;
-    const cx = marginLeft + nutW + (f - 0.5) * fretW;
-    const cy = marginTop + stringGap * 2.5;
-    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    dot.setAttribute('cx', cx); dot.setAttribute('cy', cy); dot.setAttribute('r', 5);
-    dot.setAttribute('fill', 'rgba(240, 230, 210, 0.25)');
-    svgEl.appendChild(dot);
-  });
-  doubleInlays.forEach(f => {
-    if (f > NUM_FRETS) return;
-    const cx = marginLeft + nutW + (f - 0.5) * fretW;
-    [1.2, 3.8].forEach(y => {
-      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      dot.setAttribute('cx', cx);
-      dot.setAttribute('cy', marginTop + stringGap * y);
-      dot.setAttribute('r', 5);
-      dot.setAttribute('fill', 'rgba(240, 230, 210, 0.3)');
-      svgEl.appendChild(dot);
+(function(){
+  /* ---------- Datos ---------- */
+  var STR=['e','B','G','D','A','E'];           // líneas de tablatura, de arriba a abajo
+  function seqTab(tokens){
+    var lines={E:'',A:'',D:'',G:'',B:'',e:''};
+    tokens.split(' ').forEach(function(t){
+      var s=t.charAt(0), f=t.slice(1), cell=(f+'--').slice(0,2)+'-';
+      Object.keys(lines).forEach(function(k){lines[k]+= (k===s)?cell:'---'});
     });
-  });
-
-  // Nut
-  const nut = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-  nut.setAttribute('x', marginLeft);
-  nut.setAttribute('y', marginTop - 8);
-  nut.setAttribute('width', nutW);
-  nut.setAttribute('height', stringGap * 5 + 16);
-  nut.setAttribute('fill', 'url(#nutGrad)');
-  nut.setAttribute('rx', 2);
-  svgEl.appendChild(nut);
-
-  // Fret wires
-  for (let f = 1; f <= NUM_FRETS; f++) {
-    const x = marginLeft + nutW + f * fretW;
-    const wire = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    wire.setAttribute('x', x - 1.5);
-    wire.setAttribute('y', marginTop - 8);
-    wire.setAttribute('width', 3);
-    wire.setAttribute('height', stringGap * 5 + 16);
-    wire.setAttribute('fill', '#b8a888');
-    wire.setAttribute('rx', 1);
-    svgEl.appendChild(wire);
+    return STR.map(function(k){return k+'|-'+lines[k]+'|'}).join('\n');
   }
+  function rev(tokens){var a=tokens.split(' ');return a.concat(a.slice(0,-1).reverse()).join(' ')}
+  var P1='E5 E8 A5 A7 D5 D7 G5 G7 B5 B8 e5 e8';
+  var groups3=(function(){var a=P1.split(' '),o=[];for(var i=0;i<5;i++){o.push(a[i],a[i+1],a[i+2])}return o.join(' ')})();
 
-  // Fret numbers
-  for (let f = 1; f <= NUM_FRETS; f++) {
-    const x = marginLeft + nutW + (f - 0.5) * fretW;
-    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    t.setAttribute('x', x);
-    t.setAttribute('y', marginTop - 14);
-    t.setAttribute('text-anchor', 'middle');
-    t.setAttribute('fill', '#8e8e9e');
-    t.setAttribute('font-family', 'JetBrains Mono, monospace');
-    t.setAttribute('font-size', '11');
-    t.textContent = f;
-    svgEl.appendChild(t);
-  }
+  var MODS=[
+  {id:'t',name:'Técnica',sub:'Manos limpias y parejas. Lo que se practica lento se toca rápido.',ex:[
+    {id:'t1',title:'Araña con púa alterna',bpm:'60→100',goal:'Que cada dedo caiga en su traste sin rozar las cuerdas vecinas.',
+     steps:['Un dedo por traste: 5, 6, 7 y 8.','Púa alterna estricta: abajo, arriba, abajo, arriba.','Al terminar una cuerda baja a la siguiente y regresa por el mismo camino.','Sube el metrónomo de 5 en 5 bpm solo cuando te salga limpio tres veces seguidas.'],
+     tab:'e|-5-6-7-8-|\nB|-5-6-7-8-|\nG|-5-6-7-8-|\nD|-5-6-7-8-|\nA|-5-6-7-8-|\nE|-5-6-7-8-|',note:'Dedos 1-2-3-4, una nota por tiempo.',set:60},
+    {id:'t2',title:'Ligados: hammer-on y pull-off',bpm:'60→110',goal:'Que las tres notas suenen con el mismo volumen, picando solo la primera.',
+     steps:['Pica el traste 5 y deja caer el dedo 4 en el 8 con fuerza, sin picar.','Suelta el dedo jalando un poco hacia abajo para que la nota 5 suene.','Repite sin parar en bloques de 8 tiempos.','Cambia de cuerda cada ronda.'],
+     tab:'B|-5h8p5h8p5h8p5h8p5-|',note:'h = hammer-on (ligado hacia arriba), p = pull-off (ligado hacia abajo).',set:60},
+    {id:'t3',title:'Bends afinados',bpm:'50→80',goal:'Subir la cuerda un tono completo y quedar exactamente en la nota de destino.',
+     steps:['Toca primero el traste 10 de la cuerda 2 y escucha esa nota.','Ahora toca el traste 8 y empuja con tres dedos juntos hasta igualar el 10.','Sostén dos tiempos y suelta con control hasta el 8.','Si queda bajo o alto, vuelve a escuchar la nota objetivo.'],
+     tab:'B|-8b10----10r8---|',note:'b = bend (subir la cuerda), r = soltar el bend.',set:50},
+    {id:'t4',title:'Vibrato con control',bpm:null,goal:'Un vibrato ancho y lento que suene cantado, no nervioso.',
+     steps:['Sostén una nota larga en el traste 8 de la cuerda 2.','Mueve la muñeca como girando una perilla, no solo el dedo.','Cuenta cuatro tiempos con el metrónomo en 60 y haz una oscilación por tiempo.','Luego prueba dos oscilaciones por tiempo, más rápido y más cerrado.'],
+     tab:'B|-8~~~~~~~~~~~~~~~-|',note:'~ = vibrato.',set:60},
+    {id:'t5',title:'Slides y pausa de palma',bpm:'70→120',goal:'Deslizar sin perder el ritmo y ahogar las cuerdas con la palma de forma constante.',
+     steps:['Slide: sube del 5 al 7 y baja del 7 al 5 con el mismo dedo.','Pausa de palma: apoya el filo de la mano derecha en el puente, junto a las cuerdas.','Toca corcheas en la cuerda 6 al aire con la palma ahogando.','Alterna cuatro tiempos con palma y cuatro sin palma.'],
+     tab:'G|-5/7-7\\5-5/9-9\\5-|\n\n   P.M.-----------|\nE|-0-0-0-0-3-3-5-5-|',note:'/ = slide hacia arriba, \\ = slide hacia abajo, P.M. = palm mute.',set:70},
+    {id:'t6',title:'Dedo 4 y fuerza de la mano',bpm:'50→90',goal:'Que el meñique toque tan parejo y fuerte como el índice, el medio y el anular.',
+     steps:['Los dedos se numeran así: 1 índice, 2 medio, 3 anular, 4 meñique.','Toca las combinaciones 1-2-4 y 1-3-4 en una sola cuerda, subiendo y bajando, con púa alterna.','Después haz solo 1-4 con ligados entre los trastes 5 y 8.','Si el meñique se cansa, descansa 30 segundos y sigue. No lo fuerces.'],
+     tab:'e|-5-6-8-5-7-8-5-8-|\n   1 2 4 1 3 4 1 4',note:'La fila de abajo marca qué dedo toca cada traste.',set:50}
+  ]},
+  {id:'e',name:'Escalas',sub:'La pentatónica es tu base. Aquí la aprendes en todo el mástil. Usa la pestaña Escalas para verla en cualquier tono.',ex:[
+    {id:'e1',title:'Pentatónica menor, posición 1',bpm:'60→120',goal:'Subir y bajar la forma de memoria, sin mirar el mástil.',
+     steps:['Toca el botón Escuchar para oír cómo suena a tu tempo, subiendo y bajando.','Lee la tablatura de izquierda a derecha para subir. Para bajar, léela de derecha a izquierda, al revés.','Toca en La menor (traste 5).','Sube nota por nota con púa alterna y baja por el mismo camino.','Di el nombre de cada nota en voz alta mientras tocas.','Cuando salga a 80 bpm, hazlo con los ojos cerrados.','Después ponla a sonar sobre la pista de acordes de la pestaña Escalas y solea encima.'],
+     tab:seqTab(P1),note:'Cómo leer la tablatura: la línea de abajo es la cuerda más gruesa (6ª) y la de arriba la más delgada. Cada número es el traste. Notas: La, Do, Re, Mi, Sol. Los dedos 1 y 4 hacen el trabajo en cada cuerda.',set:60},
+    {id:'e2',title:'Las cinco posiciones',bpm:'50→90',goal:'Moverte por todo el mástil uniendo las posiciones sin saltos.',
+     steps:['Abre la pestaña Escalas y elige La menor.','Aprende una posición por día: solo ella, subiendo y bajando.','Después une dos posiciones seguidas deslizando un dedo en la cuerda de unión.','Meta final: ir de la posición 1 a la 5 y regresar sin parar.'],
+     tab:null,note:null,set:50},
+    {id:'e3',title:'Patrones de tres notas',bpm:'60→100',goal:'Soltar los dedos y tocar fraseos que no suenen a escala.',
+     steps:['Toca la pentatónica en grupos de tres, avanzando una nota cada vez.','Ve los grupos escritos abajo; luego haz grupos de cuatro.','Toca subiendo con un patrón y bajando con otro.','Inventa un patrón tuyo de cuatro notas y repítelo por toda la posición.'],
+     tab:seqTab(groups3),note:'Primeros cinco grupos de la posición 1.',set:60},
+    {id:'e4',title:'Menor natural, tres notas por cuerda',bpm:'50→90',goal:'Tocar la escala de siete notas con digitación fija.',
+     steps:['Empieza en La en el traste 5 de la cuerda 6.','Tres notas por cuerda, siempre con la misma regla de dedos.','Sube las seis cuerdas y baja de regreso.','Compara con la pentatónica: la menor natural agrega Si y Fa.'],
+     tab:seqTab('E5 E7 E8 A5 A7 A8 D5 D7 D9 G5 G7 G9 B6 B8 B10 e7 e8 e10'),note:'La menor natural: La, Si, Do, Re, Mi, Fa, Sol.',set:50},
+    {id:'e5',title:'Escala de blues',bpm:'60→100',goal:'Agregar la nota azul y hacerla sonar como parte del lenguaje.',
+     steps:['Toca la posición 1 de La menor y agrega el traste 6 de la cuerda 5.','Esa nota nueva es la “nota azul”. Úsala de paso, no te quedes en ella.','Sube y baja con ligados en el traste 5 al 6 al 7.','Termina siempre en una nota estable: La.'],
+     tab:seqTab('E5 E8 A5 A6 A7 D5 D7 G5 G7 B5 B8 e5 e8'),note:'Solo cambia una nota respecto a la pentatónica.',set:60},
+    {id:'e6',title:'Pentatónica mayor, misma forma otra casa',bpm:null,goal:'Entender que cada forma sirve para menor y mayor según dónde descanses.',
+     steps:['La pentatónica de La menor es la misma que la de Do mayor.','Toca la posición 1 de La menor sobre un acorde de Do y descansa en Do.','Suena alegre en vez de triste, sin cambiar un solo dedo.','Prueba el botón “Mayor” en la pestaña Escalas para ver dónde quedan las raíces.'],
+     tab:null,note:null,set:null},
+    {id:'e7',title:'Relativas: mismas notas, otra casa',bpm:'60→90',goal:'Saber en qué escala menor puedes tocar cuando la canción está en mayor, y al revés.',
+     steps:['Abre la pestaña Escalas y elige Do en modo Mayor. Mira el cuadro de escalas relativas.','Toca las siete notas de Do mayor subiendo y bajando, empezando y terminando en Do.','Toca las mismas notas, pero empezando y terminando en La. Eso es La menor, la relativa de Do mayor.','Repite con Sol mayor y Mi menor, y con Re mayor y Si menor.','Pon la pista de acordes y descansa en la nota raíz: en la mayor suena alegre y en la menor melancólico.'],
+     tab:null,note:'Regla: la relativa menor está tres trastes abajo de la raíz mayor. Con la pentatónica es igual: Do mayor y La menor usan las mismas cinco notas.',set:60}
+  ]},
+  {id:'i',name:'Improvisación',sub:'Pocas notas con intención suenan mejor que muchas sin rumbo.',ex:[
+    {id:'i1',title:'Dos notas, un ritmo',bpm:'60',goal:'Construir una frase con casi nada y que se entienda.',
+     steps:['Elige solo dos notas de la pentatónica.','Inventa un ritmo de un compás y repítelo cuatro veces.','Cambia una sola nota del ritmo y repite.','Graba un minuto de esto con tu teléfono y escúchalo.'],
+     tab:null,note:null,set:60},
+    {id:'i2',title:'Pregunta y respuesta',bpm:'70',goal:'Tocar frases que conversan entre sí.',
+     steps:['Toca una frase corta que termine en el aire, como una pregunta.','Responde con otra frase parecida que termine en La, como una respuesta.','Deja un compás de silencio entre pregunta y respuesta.','Alarga la respuesta cada ronda.'],
+     tab:null,note:null,set:70},
+    {id:'i3',title:'Notas objetivo sobre cada acorde',bpm:'60→90',goal:'Aterrizar en notas del acorde cuando este cambia.',
+     steps:['Usa la progresión Am, G, F, E.','Sobre Am aterriza en La, Do o Mi. Sobre G en Sol, Si o Re.','Sobre F en Fa, La o Do. Sobre E en Mi, Sol sostenido o Si.','Toca una nota por compás, cada una aterrizando en una nota objetivo.'],
+     tab:'Am : La  Do  Mi\nG  : Sol Si  Re\nF  : Fa  La  Do\nE  : Mi  Sol# Si',note:'Notas del acorde, tus destinos para aterrizar.',set:60},
+    {id:'i4',title:'Blues de 12 compases en La',bpm:'70→110',goal:'Pasar los 12 compases sin perderte y variando cada vuelta.',
+     steps:['Cuenta cuatro tiempos por compás y sigue la tabla de acordes.','Primera vuelta: solo la pentatónica menor y la nota azul.','Segunda vuelta: repite una frase en cada acorde.','Tercera vuelta: termina con una frase de cierre en los dos últimos compases.'],
+     tab:'| A7 | A7 | A7 | A7 |\n| D7 | D7 | A7 | A7 |\n| E7 | D7 | A7 | E7 |',note:'Cada barra es un compás de cuatro tiempos.',set:70},
+    {id:'i5',title:'Silencios y dinámica',bpm:'70',goal:'Que el silencio también sea parte del solo.',
+     steps:['Toca una frase y quédate en silencio dos tiempos completos.','Toca la misma frase suave y luego fuerte.','Termina cada frase con una nota larga.','Cuenta cuántas notas tocas por compás y baja ese número a la mitad.'],
+     tab:null,note:null,set:70},
+    {id:'i6',title:'Solo sobre tu propia canción',bpm:null,goal:'Llevar lo que aprendes a música que te gusta.',
+     steps:['Elige una canción de tu repertorio y toca sus acordes con el metrónomo.','Entre estrofas deja un hueco de ocho compases.','Llena ese hueco con una frase de pregunta y respuesta.','Grábate y marca lo mejor para repetirlo.'],
+     tab:null,note:null,set:null}
+  ]},
+  {id:'s',name:'Sierreño y norteño',sub:'El estilo que quieres tocar en fiestas. Aquí el ritmo manda.',ex:[
+    {id:'s1',title:'Bajo alternado',bpm:'70→100',goal:'Que el pulgar marque raíz y quinta del acorde sin dudar.',
+     steps:['Forma el acorde y con el pulgar toca solo una nota grave por tiempo.','Alterna: raíz, quinta, raíz, quinta. Una nota por tiempo.','Aprende los cuatro acordes por separado antes de unirlos.','Cuando salga fluido, agrega el rasgueo del siguiente ejercicio.'],
+     tab:seqTab('A0 E0 A0 E0 A0 E0 A0 E0')+'\n\n'+'Am  raíz La (cuerda 5 al aire), quinta Mi (cuerda 6 al aire)\nG   raíz Sol (cuerda 6, traste 3), quinta Re (cuerda 4 al aire)\nF   raíz Fa (cuerda 6, traste 1), quinta Do (cuerda 5, traste 3)\nE   raíz Mi (cuerda 6 al aire), quinta Si (cuerda 5, traste 2)',note:'Una nota grave por tiempo, alternando.',set:70},
+    {id:'s2',title:'Rasgueo de polka y corrido',bpm:'90→130',goal:'Un rasgueo parejo que suene firme a todo volumen.',
+     steps:['Patrón base: bajo, abajo, abajo-arriba.','Cuenta “uno, dos y” para sentir el golpe fuerte.','Repite sobre un solo acorde hasta que tu mano lo haga sola.','Después cambia de acorde sin que el patrón se detenga.'],
+     tab:'bajo  ↓  ↓↑\nbajo  ↓  ↓↑\n1     2  y',note:'↓ rasgueo hacia abajo, ↑ hacia arriba.',set:90},
+    {id:'s3',title:'Progresión Am, G, F, E',bpm:'70→110',goal:'Cambiar de acorde a tiempo, sin pausas.',
+     steps:['Un compás por acorde: Am, G, F, E.','Con el metrónomo en 70, cambia justo en el tiempo uno.','Ve a tu cambio más lento y practícalo solo ocho veces.','Sube el tempo y agrega el bajo alternado.'],
+     tab:'| Am | G | F | E |',note:'La progresión que usan muchísimas canciones campiranas en menor.',set:70},
+    {id:'s4',title:'Rellenos de requinto',bpm:'70→100',goal:'Una frase corta entre versos que suene a requinto.',
+     steps:['Usa las cuerdas 1 y 2 de la pentatónica de La menor.','Inventa una frase de cuatro notas que termine en La.','Tócala al final de cada compás de la progresión.','Varía una nota cada vez para que no suene repetida.'],
+     tab:seqTab('e5 e8 e5 B8 B5 e8 e5'),note:'Un relleno de ejemplo: el tuyo suena mejor.',set:70},
+    {id:'s5',title:'Cantar y tocar a la vez',bpm:'70→100',goal:'Que la guitarra se toque sola y la voz pueda ir libre.',
+     steps:['Pon el patrón de guitarra en automático a 70 bpm.','Habla la letra sobre el ritmo sin cantar.','Canta suave, sin forzar, y después sube el volumen.','Si se desarma, baja 10 bpm y repite.'],
+     tab:null,note:null,set:70}
+  ]},
+  {id:'r',name:'Rock melódico instrumental',sub:'Para la Ibanez: melodías que cantan, notas largas con expresión y un tono que no suene metalero.',ex:[
+    {id:'r1',title:'Frases que cantan',bpm:'60→80',goal:'Tocar una melodía con notas largas y pocos adornos, como si la cantaras.',
+     steps:['Elige cuatro notas de la pentatónica de La menor.','Toca cada una durante dos o cuatro tiempos, dejando que suene completa.','Une las cuatro en una frase con un respiro entre ellas.','Canta la frase en voz baja antes de tocarla; si no se puede cantar, simplifícala.'],
+     tab:seqTab('e12 e10 e8 e5'),note:'Cuatro notas, cada una larga. Eso ya es una melodía.',set:60},
+    {id:'r2',title:'Bends y vibrato con expresión',bpm:'50→70',goal:'Que cada bend llegue afinado y termine en un vibrato cálido.',
+     steps:['Bend de un tono: del traste 8 al nivel del 10, sostenido dos tiempos.','Agrega vibrato justo al llegar a la nota, no antes.','Suelta el bend despacio para que la bajada también suene.','Prueba el pre-bend: dobla la cuerda en silencio, pícala ya doblada y suéltala.'],
+     tab:'B|-8b10~~~~~~-10r8----|\nB|-(8b10)r8-----------|',note:'(8b10) = pre-bend: dobla primero y pica ya doblada.',set:50},
+    {id:'r3',title:'Encontrar el tono: distorsión suave y delay',bpm:null,goal:'Un overdrive con cuerpo que deje oír las notas y no suene a metal.',
+     steps:['Empieza con el gain bajo: cada nota de un acorde debe oírse separada.','Sube el gain de poco en poco hasta que una nota larga sostenga sin zumbar.','Si suena metalero, baja los medios graves y sube un poco los medios; los solos melódicos piden medios presentes.','Baja el volumen de la guitarra a 7 u 8: el tono limpia y suaviza. Así tienes dos sonidos con la misma guitarra.','Agrega delay al tempo de la canción y deja que el eco llene los silencios.'],
+     tab:'Punto de partida (ampli o simulador)\nGain       30-40%\nBajos      50%\nMedios     55-60%\nAgudos     45%\nPresencia  bajo\n\nDelay en corchea con puntillo\n 70 bpm = 643 ms\n 80 bpm = 563 ms\n 90 bpm = 500 ms\n100 bpm = 450 ms\n120 bpm = 375 ms\nFeedback 25-30%, mezcla 20%',note:'Son solo puntos de partida. Cada ampli suena distinto, ajusta de oído.',set:null},
+    {id:'r4',title:'Legato fluido de tres notas',bpm:'60→100',goal:'Pasajes rápidos y suaves picando muy poco.',
+     steps:['Toca tres notas por cuerda con ligados: pica una sola vez y liga las otras.','Sube y baja en una cuerda antes de pasar a la siguiente.','Haz que las tres notas suenen con el mismo volumen.','Usa la menor natural en La para hacer una frase de dos cuerdas.'],
+     tab:'G|-5h7h9p7p5-7h9p7p5-|\nD|-5h7h9p7p5-7h9p7p5-|',note:'Una pica, el resto lo hace tu mano izquierda.',set:60},
+    {id:'r5',title:'Melodía sobre Am, F, C, G',bpm:'70→100',goal:'Crear una melodía que siga los acordes en vez de correr sobre ellos.',
+     steps:['Pon la progresión Am, F, C, G con el metrónomo, un compás por acorde.','Sobre cada acorde aterriza en una de sus notas: Am (La, Do, Mi), F (Fa, La, Do), C (Do, Mi, Sol), G (Sol, Si, Re).','Primero toca solo la nota de aterrizaje de cada compás.','Después conecta las notas con pasos cortos de la pentatónica.'],
+     tab:'| Am | F | C | G |\n\n'+seqTab('e5 e8 e10 e8 e5 B8 B5'),note:'Una frase de ejemplo sobre Am.',set:70},
+    {id:'r6',title:'Sacar una rola por frases',bpm:'60',goal:'Aprender una canción completa dividiéndola en trozos pequeños.',
+     steps:['Separa la guitarra con Moisés y baja la velocidad al 70%.','Escucha una frase de dos compases cinco veces antes de tocar.','Busca la primera nota; prueba con la pentatónica y con la menor natural.','Anota los trastes en TuxGuitar y avanza frase por frase.','Toca la frase lenta y sube la velocidad de poco en poco.'],
+     tab:null,note:null,set:60}
+  ]},
+  {id:'f',name:'Tono y efectos',sub:'Qué hace cada pedal, cada perilla y en qué orden va. Probado con Fender Studio Pro y tu Ibanez; sirve igual en FL Studio.',ex:[
+    {id:'f1',title:'La cadena de señal: el orden importa',bpm:null,goal:'Saber en qué orden va cada efecto y por qué.',
+     steps:['Arma la cadena en este orden en tu programa y toca una frase.','Mueve el delay antes de la distorsión: el sonido se vuelve un barullo. Regrésalo al final y compara.','Regla simple: lo que cambia el tono o el empuje (wah, boost, distorsión) va antes del ampli. Lo que da espacio (chorus, delay, reverb) va después.','Vai y Satriani abren con wah y drives, y dejan el delay y la reverb al final.'],
+     tab:'Guitarra\n  ↓\nWah\n  ↓\nCompresor o Boost\n  ↓\nOverdrive o Distorsión\n  ↓\nAmplificador\n  ↓\nChorus o Flanger\n  ↓\nDelay\n  ↓\nReverb\n  ↓\nInterfaz de audio',note:'Es el orden más común. Después puedes experimentar.',set:null},
+    {id:'f2',title:'Graves, medios y agudos',bpm:'60',goal:'Saber qué hace cada perilla del ampli para arreglar tu tono tú solo.',
+     steps:['Pon a repetir una frase de la pentatónica con el tono que ya tienes.','Baja los graves al mínimo y luego al máximo. Dan cuerpo, pero de más retumban.','Haz lo mismo con los medios. Son la presencia de la guitarra; sin ellos el sonido queda hueco y metalero.','Haz lo mismo con los agudos. Dan brillo y mordida, pero de más cansan el oído.','Deja todo en medio y sube los medios un poco. Casi siempre es lo que hace falta en un solo melódico.'],
+     tab:'Graves   cuerpo y peso\nMedios   presencia, la voz de la guitarra\nAgudos   brillo y ataque',note:'Mueve una perilla a la vez para saber qué cambia cada una.',set:60},
+    {id:'f3',title:'Limpio, crunch y lead',bpm:null,goal:'Tener tres sonidos con la misma guitarra, solo moviendo el gain y el volumen.',
+     steps:['Limpio: gain bajo. Cada nota de un acorde se oye separada. Va bien para campirano y arpegios.','Crunch: gain a media. Los acordes se endurecen y las notas largas empiezan a sostener. Es el rock clásico.','Lead: gain alto más un boost adelante. Las notas sostienen solas, ideal para bends y vibrato.','Toca la misma frase en los tres y escucha qué cambia.','Baja el volumen de la guitarra a 7 u 8 en el lead y verás que limpia sin tocar el ampli.'],
+     tab:'Limpio   gain 20%   campirano, arpegios\nCrunch   gain 45%   rock clásico\nLead     gain 65%   solos y melodías',note:'Son puntos de partida. Cada ampli suena distinto.',set:null},
+    {id:'f4',title:'Overdrive, distorsión y fuzz',bpm:null,goal:'Reconocer de oído qué tipo de ganancia tiene cada canción.',
+     steps:['Overdrive: suaviza y empuja al ampli. Es el estilo clásico del Tube Screamer. En Fender Studio Pro prueba Tube Dreamer o Tube Driver de Ampire.','Distorsión: más agresiva y comprimida. Es lo que hace un Boss DS-1. Prueba Red Light Distortion con el tipo Hard Tube o Transistor.','Fuzz: grueso, áspero y casi sintético. Prueba Big Fuzz de Ampire solo para saber cómo suena.','Toca el mismo riff con cada uno y anota cuál se parece más a las rolas que quieres sacar.'],
+     tab:null,note:null,set:null},
+    {id:'f5',title:'Lead estilo Steve Vai',bpm:null,goal:'Un solo cantado, con mucho sustain y notas que se mantienen.',
+     steps:['Ampli: en Ampire elige MCM 800, de estilo Marshall. Es un buen punto de partida de alta ganancia.','Adelante pon un Tube Dreamer o Tube Driver con el gain bajo y el nivel arriba, solo para empujar al ampli.','Ampli con gain en 6 de 10, medios arriba de la media y graves y agudos en medio.','Al final pon un delay en corchea con puntillo con poco feedback y una reverb chica. Los milisegundos están en el módulo de rock melódico.','Toca notas largas con bends y vibrato. Si zumba cuando callas, baja el gain.'],
+     tab:'Guitarra → Wah\n  → Tube Dreamer (gain bajo, nivel alto)\n  → Ampire MCM 800 (gain 6)\n  → Delay corto\n  → Reverb chica',note:'Vai usa Carvin Legacy, Synergy y Axe-Fx. Esto es una aproximación de oído, no su equipo exacto.',set:null},
+    {id:'f6',title:'Limpio espacioso de rock melódico',bpm:'60→80',goal:'Ese sonido limpio, abierto y con eco que se oye en el rock melódico instrumental.',
+     steps:['Ampli limpio: en Ampire prueba Blackface Twin con el gain bajo.','Toca con la pastilla del mástil: suena más redondo y dulce.','Agrega un chorus muy suave. La idea es que apenas se note.','Pon un delay de 400 a 500 ms con poco feedback y una reverb de salón mediana.','Toca notas largas y arpegios abiertos y deja que los efectos llenen los silencios.'],
+     tab:'Ampire Blackface Twin  gain bajo\nChorus   profundidad baja\nDelay    450 ms (100 bpm), feedback 25%\nReverb   salón mediano, mezcla 25%',note:'Puntos de partida para ajustar de oído.',set:70},
+    {id:'f7',title:'Tono estilo Joe Satriani',bpm:null,goal:'Un lead con cuerpo y claridad, con chorus suave y wah expresivo.',
+     steps:['Satriani toca con ampli Marshall JVM de firma; en Ampire acércate con el MCM 800.','Adelante usa un Boss DS-1 o similar. En Fender Studio Pro prueba Red Light Distortion con Hard Tube y el gain medio.','Pon un chorus básico, tipo Boss CH-1, con la mezcla baja.','Agrega delay y reverb al final, no muy largos.','Toca una melodía lenta con notas largas y deja que el sustain cante.'],
+     tab:'Guitarra → Wah\n  → Boost o Distorsión\n  → Ampli estilo Marshall\n  → Chorus suave\n  → Delay',note:'Basado en su equipo real: JVM, DS-1, Boss CH-1 y Vox Big Bad Wah.',set:null},
+    {id:'f8',title:'El wah como voz',bpm:'70',goal:'Hacer que el pedal wah diga algo y no solo suene.',
+     steps:['Busca un efecto tipo wah entre los efectos de tu programa y asígnalo a un control de expresión si tienes uno.','Barrido lento: sube y baja el pedal una vez por compás sobre una nota larga.','Wah quieto: deja el pedal a medio camino para un tono nasal y fijo, de solo.','Sigue el ritmo: mueve el pedal al tempo del metrónomo, una oscilación por tiempo.'],
+     tab:null,note:null,set:70},
+    {id:'f9',title:'Dónde conseguir los tonos de Vai y Satriani',bpm:null,goal:'Saber qué existe, para qué sirve y cuánto cuesta antes de comprar.',
+     steps:['AmpliTube Joe Satriani, de IK Multimedia, para Mac y PC. Trae tres ampis (Marshall JVM, Peavey 5150 y Rockman) y cinco pedales. Costó 99 dólares al lanzarse. <a href="https://www.sweetwater.com/store/detail/AmpliTubeJS--ik-multimedia-amplitube-joe-satriani-collection-software-suite/reviews" target="_blank" rel="noopener">Ver en Sweetwater</a>','Joe Satriani Amp Vault, de IK Multimedia, a unos 100 dólares. Incluye su amplificador Dragon 100. <a href="https://www.pluginboutique.com/products/13420-Tonex-Joe-Satriani-Amp-Vault" target="_blank" rel="noopener">Ver en Plugin Boutique</a>','Spark Mini Vai, de Positive Grid, es el amplificador chiquito en color vino (burgundy). Es un aparato físico con cuatro tonos que hizo Vai. En una oferta costaba 219 dólares, antes 269. <a href="https://www.guitarworld.com/gear/desktop-amps/positive-grid-spark-mini-steve-vai-sale" target="_blank" rel="noopener">Ver la nota en Guitar World</a>','Antes de comprar un plugin, revisa en su página que sea compatible con tu programa (FL Studio o Fender Studio Pro) y con tu sistema.'],
+     tab:null,note:'Precios vistos en notas y tiendas, pueden cambiar. Confírmalos en la tienda.',set:null}
+  ]},
+  {id:'o',name:'Oído y repertorio',sub:'Lo que aprendes en el mástil tiene que acabar en canciones.',ex:[
+    {id:'o1',title:'Sacar una melodía de oído',bpm:null,goal:'Reconocer una melodía y encontrarla en el mástil.',
+     steps:['Elige una melodía corta y conocida.','Búscala nota por nota en una sola cuerda.','Ahora búscala usando la pentatónica de la tonalidad.','Escribe los números de traste que encontraste.'],
+     tab:null,note:null,set:null},
+    {id:'o2',title:'Una canción por semana',bpm:null,goal:'Llegar a ocho canciones en dos meses.',
+     steps:['Elige una canción campirana con tres o cuatro acordes.','Primeros dos días: acordes y cambios.','Siguientes dos días: rasgueo, bajo alternado y voz.','Último día: tócala de principio a fin y grábate.'],
+     tab:null,note:null,set:null},
+    {id:'o3',title:'Grábate y escúchate',bpm:null,goal:'Detectar lo que se escucha distinto de lo que sientes.',
+     steps:['Graba cinco minutos de práctica con tu teléfono o tu interfaz.','Escúchala al otro día y anota una cosa para mejorar.','Practica solo esa cosa durante una semana.','Compara con la grabación anterior.'],
+     tab:null,note:null,set:null}
+  ]}
+  ];
 
-  // Strings + labels
-  for (let s = 0; s < 6; s++) {
-    // string index in SVG: string 0 (low E) at the bottom visually
-    // Standard fretboard diagram convention: low E at top or bottom?
-    // We'll show high e at top (like looking at a chord chart) — string 5 (high e) at y = marginTop
-    // So visual row for state string s: y = marginTop + (5 - s) * stringGap
-    const y = marginTop + (5 - s) * stringGap;
-    const thickness = 1 + (5 - s) * 0.35; // low strings thicker
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', marginLeft);
-    line.setAttribute('x2', width - marginRight);
-    line.setAttribute('y1', y);
-    line.setAttribute('y2', y);
-    line.setAttribute('stroke', s < 3 ? '#a8a8b0' : '#e0e0e5');
-    line.setAttribute('stroke-width', thickness);
-    line.setAttribute('opacity', '0.85');
-    svgEl.appendChild(line);
+  var ROUT=[
+    {name:'Rutina corta',min:15,items:[['Calentamiento',3,'t1'],['Técnica',5,'t2'],['Escala',4,'e1'],['Improvisar',3,'i1']]},
+    {name:'Rutina media',min:30,items:[['Calentamiento',5,'t1'],['Técnica',7,'t5'],['Escalas',8,'e3'],['Improvisación',6,'i2'],['Repertorio',4,'s3']]},
+    {name:'Rutina larga',min:60,items:[['Calentamiento',6,'t1'],['Técnica',10,'t3'],['Escalas',10,'e2'],['Blues',12,'i4'],['Sierreño',12,'s1'],['Canción',10,'s5']]}
+  ];
 
-    // Label
-    const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    lbl.setAttribute('x', marginLeft - 12);
-    lbl.setAttribute('y', y + 4);
-    lbl.setAttribute('text-anchor', 'end');
-    lbl.setAttribute('fill', '#8e8e9e');
-    lbl.setAttribute('font-family', 'JetBrains Mono, monospace');
-    lbl.setAttribute('font-size', '13');
-    lbl.setAttribute('font-weight', '700');
-    lbl.textContent = STRING_LABELS[s];
-    svgEl.appendChild(lbl);
-  }
+  /* Notas para el botón Escuchar. Letra = cuerda (E grave, e aguda), número = traste.
+     > = bend (sube la nota), ~ = nota larga con vibrato, * = nota larga */
+  var LISTEN={
+    t1:(function(){var o=[];['E','A','D','G','B','e'].forEach(function(s){[5,6,7,8].forEach(function(f){o.push(s+f)})});return o.join(' ')})(),
+    t2:'B5 B8 B5 B8 B5 B8 B5 B8 B5',
+    t3:'B10* B8* B8>10',
+    t4:'B8~',
+    t5:'G5 G7 G7 G5 G5 G9 G9 G5',
+    t6:'e5 e6 e8 e5 e7 e8 e5 e8',
+    e1:rev(P1),
+    e3:groups3,
+    e4:'E5 E7 E8 A5 A7 A8 D5 D7 D9 G5 G7 G9 B6 B8 B10 e7 e8 e10',
+    e5:'E5 E8 A5 A6 A7 D5 D7 G5 G7 B5 B8 e5 e8',
+    r1:'e12* e10* e8* e5*',
+    r2:'B8>10 B10~ B8*',
+    r4:'G5 G7 G9 G7 G5 G7 G9 G7 G5 D5 D7 D9 D7 D5 D7 D9 D7 D5',
+    r5:'e5 e8 e10 e8 e5 B8 B5',
+    s1:'A0 E0 A0 E0 A0 E0 A0 E0',
+    s4:'e5 e8 e5 B8 B5 e8 e5'
+  };
 
-  // Notes on fretboard
-  for (let s = 0; s < 6; s++) {
-    for (let f = 0; f <= NUM_FRETS; f++) {
-      const note = noteAt(s, f);
-      if (!isInScale(note, scaleNotes)) continue;
-      const inRange = !highlightRange || (f >= highlightRange.start && f <= highlightRange.end);
-      if (!showAll && !inRange) continue;
+  /* ---------- Estado ---------- */
+  var done={}, bpm=80;
+  try{done=JSON.parse(localStorage.getItem('tg-done')||'{}')}catch(e){}
+  try{bpm=parseInt(localStorage.getItem('tg-bpm'),10)||80}catch(e){}
+  function save(){try{localStorage.setItem('tg-done',JSON.stringify(done));localStorage.setItem('tg-bpm',String(bpm))}catch(e){}}
+  var $=function(s){return document.querySelector(s)};
+  var CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
-      const isRoot = note === state.root;
-      const y = marginTop + (5 - s) * stringGap;
-      const x = f === 0
-        ? marginLeft - 30  // open string marker
-        : marginLeft + nutW + (f - 0.5) * fretW;
-
-      const r = 12;
-      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      circle.setAttribute('cx', x);
-      circle.setAttribute('cy', y);
-      circle.setAttribute('r', r);
-      let fillColor;
-      if (highlightRange && inRange) {
-        fillColor = isRoot ? 'url(#rootGrad)' : 'url(#posGrad)';
-      } else {
-        fillColor = isRoot ? 'url(#rootGrad)' : 'url(#scaleGrad)';
-      }
-      circle.setAttribute('fill', fillColor);
-      circle.setAttribute('stroke', '#0a0a0f');
-      circle.setAttribute('stroke-width', '2');
-      if (isRoot) {
-        circle.setAttribute('filter', 'drop-shadow(0 0 4px rgba(255,61,90,0.6))');
-      }
-      // Dim notes outside range when highlighting
-      if (highlightRange && !inRange) {
-        circle.setAttribute('opacity', '0.25');
-      }
-      svgEl.appendChild(circle);
-
-      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      label.setAttribute('x', x);
-      label.setAttribute('y', y + 4);
-      label.setAttribute('text-anchor', 'middle');
-      label.setAttribute('fill', isRoot ? '#fff' : '#001a25');
-      label.setAttribute('font-family', 'Space Grotesk, sans-serif');
-      label.setAttribute('font-size', '11');
-      label.setAttribute('font-weight', '700');
-      if (highlightRange && !inRange) label.setAttribute('opacity', '0.4');
-      const txt = state.display === 'degrees'
-        ? getDegree(note, state.root, state.scale)
-        : noteName(note);
-      label.textContent = txt;
-      svgEl.appendChild(label);
-    }
-  }
-}
-
-// ============ RENDER TABS ============
-function renderTabs() {
-  const positions = getPositionsForScale(state.scale);
-  const posIdx = state.position === 0 ? 1 : state.position;
-  const range = getPositionRange(state.root, state.scale, posIdx);
-  const scaleNotes = getScaleNotes(state.root, state.scale);
-
-  // Gather notes in the position for each string
-  // string index 0 = low E, 5 = high e
-  const stringFrets = []; // [ [frets on E], [frets on A], ... ]
-  for (let s = 0; s < 6; s++) {
-    const frets = [];
-    for (let f = range.start; f <= range.end; f++) {
-      if (f < 0 || f > NUM_FRETS) continue;
-      const n = noteAt(s, f);
-      if (isInScale(n, scaleNotes)) frets.push(f);
-    }
-    stringFrets.push(frets);
-  }
-
-  // Build ascending sequence: from low E up to high e, each string in order
-  const sequenceUp = [];
-  for (let s = 0; s < 6; s++) {
-    stringFrets[s].forEach(f => sequenceUp.push({ string: s, fret: f }));
-  }
-  const sequenceDown = [...sequenceUp].reverse();
-
-  document.getElementById('tab-up').innerHTML = buildTabLines(sequenceUp);
-  document.getElementById('tab-down').innerHTML = buildTabLines(sequenceDown);
-}
-
-function buildTabLines(sequence) {
-  // 6 lines, string labels e B G D A E (top to bottom - high to low, tab convention)
-  // In tab, the high e is the top line, low E is the bottom line
-  const rows = [[], [], [], [], [], []]; // 0 = high e (top), 5 = low E (bottom)
-  const labels = ['e', 'B', 'G', 'D', 'A', 'E'];
-  // sequence uses state string idx (0 = low E, 5 = high e)
-  // Convert to tab row: tabRow = 5 - stringIdx
-  sequence.forEach(({ string, fret }) => {
-    const tabRow = 5 - string;
-    // Add fret to that row, pad others with —
-    const fretStr = String(fret).padStart(2, '-');
-    for (let r = 0; r < 6; r++) {
-      if (r === tabRow) {
-        rows[r].push(fretStr);
-      } else {
-        rows[r].push('--');
-      }
-    }
-  });
-
-  const scaleNotes = getScaleNotes(state.root, state.scale);
-  const lines = rows.map((row, i) => {
-    const stringIdx = 5 - i;
-    let line = `<span class="string-name">${labels[i]}|</span>`;
-    row.forEach(cell => {
-      if (cell === '--') {
-        line += '--';
-      } else {
-        const fretNum = parseInt(cell.replace('-', ''), 10);
-        const note = noteAt(stringIdx, fretNum);
-        const isRoot = note === state.root;
-        line += `<span class="fret-num${isRoot ? ' root' : ''}">${cell}</span>`;
-      }
-      line += '-';
+  /* ---------- Curso ---------- */
+  var html='';
+  MODS.forEach(function(m){
+    html+='<div class="mod" id="mod-'+m.id+'"><div class="mod-head"><h2>'+m.name+'</h2><span class="count" id="cnt-'+m.id+'"></span></div>'+
+      '<p class="sub">'+m.sub+'</p><div class="bar"><b id="bar-'+m.id+'"></b></div>';
+    m.ex.forEach(function(x){
+      html+='<details class="ex" id="ex-'+x.id+'"><summary>'+
+        '<button class="tick" data-id="'+x.id+'" aria-pressed="false" aria-label="Marcar como dominado: '+x.title+'">'+CHECK+'</button>'+
+        '<span class="ex-title">'+x.title+'</span>'+(x.bpm?'<span class="chip">'+x.bpm+'</span>':'')+'<span class="chev"></span></summary>'+
+        '<div class="ex-body"><p class="goal"><b>Meta:</b> '+x.goal+'</p><ol>'+x.steps.map(function(s){return '<li>'+s+'</li>'}).join('')+'</ol>'+
+        (x.tab?'<pre class="tab">'+x.tab+'</pre>':'')+(x.note?'<p class="tab-note">'+x.note+'</p>':'')+
+        (LISTEN[x.id]?'<button class="btn" data-play="'+x.id+'">▶ Escuchar</button>':'')+
+        (x.set?'<button class="btn" data-bpm="'+x.set+'">Metrónomo en '+x.set+' bpm</button>':'')+
+        (x.id==='e2'||x.id==='e6'?'<a class="btn" style="text-decoration:none" href="#escalas">Ver diagramas</a>':'')+
+        '</div></details>';
     });
-    line += '|';
-    return line;
+    html+='</div>';
   });
-  return lines.join('\n');
-}
+  $('#modules').innerHTML=html;
 
-// ============ RENDER SCALE INFO ============
-function renderInfo() {
-  const s = SCALES[state.scale];
-  const rootName = noteName(state.root);
-  document.getElementById('scale-name').innerHTML =
-    `<span class="root-note">${rootName}</span> ${s.name}`;
+  function refresh(){
+    var tot=0,dn=0;
+    MODS.forEach(function(m){
+      var c=0;
+      m.ex.forEach(function(x){
+        var ok=!!done[x.id]; if(ok)c++;
+        $('#ex-'+x.id+' .tick').setAttribute('aria-pressed',ok?'true':'false');
+      });
+      tot+=m.ex.length;dn+=c;
+      $('#cnt-'+m.id).textContent=c+' de '+m.ex.length;
+      $('#bar-'+m.id).style.width=(100*c/m.ex.length)+'%';
+    });
+    $('#totaltxt').textContent=dn+' de '+tot;
+    $('#totalbar').style.width=(100*dn/tot)+'%';
+  }
+  refresh();
 
-  const notes = getScaleNotes(state.root, state.scale);
-  const notesList = notes.map((n, i) => {
-    const isRoot = n === state.root;
-    const label = state.display === 'degrees' ? s.degrees[i] : noteName(n);
-    return `<span class="note${isRoot ? ' root' : ''}">${label}</span>`;
+  document.addEventListener('click',function(e){
+    var t=e.target.closest('.tick');
+    if(t){e.preventDefault();var id=t.dataset.id;if(done[id])delete done[id];else done[id]=1;save();refresh();return}
+    var b=e.target.closest('[data-bpm]');
+    if(b){setBpm(parseInt(b.dataset.bpm,10));return}
+  });
+
+  /* ---------- Escalas ---------- */
+  var KEYS=[['Do',0],['Do♯',1],['Re',2],['Mi♭',3],['Mi',4],['Fa',5],['Fa♯',6],['Sol',7],['La♭',8],['La',9],['Si♭',10],['Si',11]];
+  var OPEN=[4,9,2,7,11,4];
+  var NAMES=['6ª','5ª','4ª','3ª','2ª','1ª'];
+  // Pentatónica menor de La, 5 posiciones. Por cuerda (6ª a 1ª): trastes.
+  var PA=[
+    [[5,8],[5,7],[5,7],[5,7],[5,8],[5,8]],
+    [[8,10],[7,10],[7,10],[7,9],[8,10],[8,10]],
+    [[10,12],[10,12],[10,12],[9,12],[10,13],[10,12]],
+    [[12,15],[12,15],[12,14],[12,14],[13,15],[12,15]],
+    [[15,17],[15,17],[14,17],[14,17],[15,17],[15,17]]
+  ];
+  var sel=$('#key');
+  sel.innerHTML=KEYS.map(function(k,i){return '<option value="'+k[1]+'"'+(k[1]===9?' selected':'')+'>'+k[0]+'</option>'}).join('');
+  var mode='menor',lastList=[];
+  var STRN=['E','A','D','G','B','e'];
+
+  function box(fr,rootP,n){
+    var all=[].concat.apply([],fr), base=Math.min.apply(null,all);
+    var W=132,H=156,x0=30,dx=16,y0=30,dy=24,s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Posición '+n+'">';
+    for(var c=0;c<6;c++) s+='<text class="sn" x="'+(x0+c*dx)+'" y="14">'+STRN[c]+'</text>';
+    for(var r=0;r<=5;r++){var y=y0+r*dy;s+='<line class="'+((r===0&&base===1)?'nut':'fr')+'" x1="'+x0+'" x2="'+(x0+5*dx)+'" y1="'+y+'" y2="'+y+'"/>'}
+    for(c=0;c<6;c++) s+='<line class="st" x1="'+(x0+c*dx)+'" x2="'+(x0+c*dx)+'" y1="'+y0+'" y2="'+(y0+5*dy)+'"/>';
+    s+='<text class="bl" x="'+(x0-9)+'" y="'+(y0+dy/2+3)+'" text-anchor="end">'+base+'</text>';
+    fr.forEach(function(arr,c){arr.forEach(function(f){
+      var note=(OPEN[c]+f)%12, cx=x0+c*dx, cy=y0+(f-base)*dy+dy/2, isR=(note===rootP);
+      s+='<circle class="'+(isR?'root':'dot')+'" cx="'+cx+'" cy="'+cy+'" r="7"/>'+
+         '<text class="dn '+(isR?'r':'d')+'" x="'+cx+'" y="'+(cy+3)+'">'+f+'</text>';
+    })});
+    return s+'</svg>';
+  }
+  function drawBoxes(){
+    var key=parseInt(sel.value,10);
+    var minorRoot=(mode==='menor')?key:(key+9)%12;
+    var shift=((minorRoot-9)%12+12)%12;
+    var list=PA.map(function(p,i){
+      var fr=p.map(function(a){return a.map(function(f){return f+shift})});
+      var mn=Math.min.apply(null,[].concat.apply([],fr));
+      while(mn<1){fr=fr.map(function(a){return a.map(function(f){return f+12})});mn+=12}
+      while(mn>12){fr=fr.map(function(a){return a.map(function(f){return f-12})});mn-=12}
+      return {n:i+1,fr:fr,base:mn};
+    }).sort(function(a,b){return a.base-b.base});
+    lastList=list;
+    $('#boxes').innerHTML=list.map(function(p){
+      return '<div class="boxcard"><h3>Posición '+p.n+'<span>traste '+p.base+'</span></h3><button class="mini" data-pos="'+p.n+'">▶ Escuchar</button>'+box(p.fr,key,p.n)+'</div>';
+    }).join('');
+    var kn=KEYS.filter(function(k){return k[1]===key})[0][0];
+    $('#legend').textContent='Pentatónica '+mode+' de '+kn+'. Practica cada posición subiendo y bajando con el metrónomo, y descansa siempre en una nota dorada.';
+  }
+  sel.addEventListener('change',drawBoxes);
+  function setMode(m){mode=m;$('#m-menor').setAttribute('aria-pressed',m==='menor');$('#m-mayor').setAttribute('aria-pressed',m==='mayor');drawBoxes()}
+  $('#m-menor').onclick=function(){setMode('menor')};
+  $('#m-mayor').onclick=function(){setMode('mayor')};
+  drawBoxes();
+
+  /* ---------- Rutinas ---------- */
+  $('#routines').innerHTML=ROUT.map(function(r){
+    return '<div class="routine"><header><h2>'+r.name+'</h2><span>'+r.min+' min</span></header><ul>'+
+      r.items.map(function(it){
+        return '<li><span class="min">'+it[1]+' min</span><span class="what"><b>'+it[0]+'</b><a data-open="'+it[2]+'">Abrir ejercicio</a></span>'+
+          '<button class="go" data-go="'+it[1]+'" data-label="'+it[0]+'">Iniciar</button></li>';
+      }).join('')+'</ul></div>';
   }).join('');
-  document.getElementById('scale-notes-list').innerHTML = notesList;
-}
-
-// ============ RENDER POSITION SECTION ============
-function renderPositionSection() {
-  const positions = getPositionsForScale(state.scale);
-  const posIdx = state.position === 0 ? 1 : state.position;
-  const range = getPositionRange(state.root, state.scale, posIdx);
-  const pos = positions[posIdx - 1];
-  document.getElementById('position-title').textContent =
-    `${pos.name} · ${noteName(state.root)} ${SCALES[state.scale].name}`;
-  document.getElementById('position-range').textContent =
-    `Trastes ${range.start} – ${range.end}`;
-
-  renderFretboard(document.getElementById('fretboard-pos'), {
-    highlightRange: range,
-    showAll: false,
-  });
-}
-
-// ============ RENDER POSITION BUTTONS ============
-function renderPositionButtons() {
-  const positions = getPositionsForScale(state.scale);
-  const group = document.getElementById('position-group');
-  const isPent = state.scale === 'pentMajor' || state.scale === 'pentMinor' || state.scale === 'blues';
-  const label = isPent ? 'Caja' : 'Pos';
-  group.innerHTML = '';
-  positions.forEach((p, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'btn pos-btn' + (state.position === i + 1 ? ' active' : '');
-    btn.textContent = `${label} ${i + 1}`;
-    btn.onclick = () => { state.position = i + 1; renderAll(); };
-    group.appendChild(btn);
-  });
-}
-
-// ============ MASTER RENDER ============
-function renderAll() {
-  renderInfo();
-  renderPositionButtons();
-  renderFretboard(document.getElementById('fretboard-full'), { showAll: true });
-  renderPositionSection();
-  renderTabs();
-  updateActiveButtons();
-}
-
-function updateActiveButtons() {
-  document.querySelectorAll('#root-group .btn').forEach((b, i) => {
-    b.classList.toggle('active', i === state.root);
-  });
-  document.querySelectorAll('#scale-group .btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.scale === state.scale);
-  });
-  document.querySelectorAll('[data-display]').forEach(b => {
-    b.classList.toggle('active', b.dataset.display === state.display);
-  });
-  document.querySelectorAll('[data-inst]').forEach(b => {
-    b.classList.toggle('active', b.dataset.inst === state.instrument);
-  });
-  document.getElementById('doce-note').classList.toggle('show', state.instrument === 'docerola');
-}
-
-// ============ BUILD CONTROLS ============
-function buildControls() {
-  const rootGroup = document.getElementById('root-group');
-  NOTES.forEach((n, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'btn' + (i === state.root ? ' active' : '');
-    btn.textContent = n;
-    btn.onclick = () => { state.root = i; renderAll(); };
-    rootGroup.appendChild(btn);
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('[data-open]');
+    if(a){location.hash='#curso';setTimeout(function(){var d=$('#ex-'+a.dataset.open);if(d){d.open=true;d.scrollIntoView({block:'start'})}},60);return}
+    var g=e.target.closest('[data-go]');
+    if(g){startTimer(parseInt(g.dataset.go,10),g.dataset.label)}
   });
 
-  const scaleGroup = document.getElementById('scale-group');
-  Object.entries(SCALES).forEach(([key, s]) => {
-    const btn = document.createElement('button');
-    btn.className = 'btn scale-btn' + (key === state.scale ? ' active' : '');
-    btn.textContent = s.name;
-    btn.dataset.scale = key;
-    btn.onclick = () => {
-      state.scale = key;
-      // Reset position if out of range
-      const maxPos = getPositionsForScale(key).length;
-      if (state.position > maxPos) state.position = 1;
-      if (state.position === 0) state.position = 1;
-      renderAll();
-    };
-    scaleGroup.appendChild(btn);
-  });
+  /* ---------- Navegación por hash ---------- */
+  var VIEWS=['curso','escalas','rutinas'];
+  function route(){
+    var h=(location.hash||'#curso').slice(1);if(VIEWS.indexOf(h)<0)h='curso';
+    VIEWS.forEach(function(v){
+      $('#v-'+v).hidden=(v!==h);
+      var a=document.querySelector('nav a[data-v="'+v+'"]');
+      if(v===h)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');
+    });
+  }
+  window.addEventListener('hashchange',function(){route();window.scrollTo(0,0)});
+  route();
 
-  document.querySelectorAll('[data-display]').forEach(btn => {
-    btn.onclick = () => { state.display = btn.dataset.display; renderAll(); };
-  });
-  document.querySelectorAll('[data-inst]').forEach(btn => {
-    btn.onclick = () => { state.instrument = btn.dataset.inst; updateActiveButtons(); };
-  });
-}
+  /* ---------- Metrónomo ---------- */
+  var ac=null,playing=false,nextT=0,beat=0,tid=null,wl=null;
+  function audio(){if(!ac){var C=window.AudioContext||window.webkitAudioContext;ac=new C()}if(ac.state==='suspended')ac.resume();return ac}
+  function tone(t,f,len,vol){
+    var o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.003);g.gain.exponentialRampToValueAtTime(0.0001,t+len);
+    o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+len+.02);
+  }
+  var dots=document.querySelectorAll('#beats i');
+  function sched(){
+    while(nextT<ac.currentTime+.12){
+      var acc=(beat%4===0);tone(nextT,acc?1700:1050,.05,acc?.55:.4);
+      (function(b,t){setTimeout(function(){dots.forEach(function(d,i){d.classList.toggle('on',i===b%4&&playing)})},Math.max(0,(t-ac.currentTime)*1000))})(beat,nextT);
+      nextT+=60/bpm;beat++;
+    }
+  }
+  var PLAY='<path d="M7 4.5v15l13-7.5z"/>',STOP='<rect x="6" y="6" width="12" height="12" rx="1.5"/>';
+  function toggle(){
+    if(!playing){
+      if(tPlaying)tStop();
+      audio();nextT=ac.currentTime+.06;beat=0;playing=true;tid=setInterval(sched,25);
+      try{if(navigator.wakeLock)navigator.wakeLock.request('screen').then(function(l){wl=l}).catch(function(){})}catch(e){}
+    }else{
+      playing=false;clearInterval(tid);dots.forEach(function(d){d.classList.remove('on')});
+      try{if(wl){wl.release();wl=null}}catch(e){}
+    }
+    $('#playicon').innerHTML=playing?STOP:PLAY;
+    $('#play').setAttribute('aria-label',playing?'Detener metrónomo':'Iniciar metrónomo');
+  }
+  function setBpm(n){bpm=Math.max(30,Math.min(240,n));$('#bpm').textContent=bpm;$('#tinfo').textContent=bpm+' BPM · cambia con + y − abajo';save()}
+  $('#play').onclick=toggle;
+  $('#up').onclick=function(){setBpm(bpm+5)};
+  $('#dn').onclick=function(){setBpm(bpm-5)};
+  setBpm(bpm);
 
-// ============ INIT ============
-state.position = 1;
-buildControls();
-renderAll();
+  /* ---------- Escalas relativas ---------- */
+  var LET=['Do','Re','Mi','Fa','Sol','La','Si'],LPC=[0,2,4,5,7,9,11];
+  var MAJ=[0,2,4,5,7,9,11],MIN=[0,2,3,5,7,8,10];
+  var FIFTHS=[['Do','La','sin alteraciones'],['Sol','Mi','1 ♯'],['Re','Si','2 ♯'],['La','Fa♯','3 ♯'],['Mi','Do♯','4 ♯'],['Si','Sol♯','5 ♯'],['Fa♯','Re♯','6 ♯'],['Re♭','Si♭','5 ♭'],['La♭','Fa','4 ♭'],['Mi♭','Do','3 ♭'],['Si♭','Sol','2 ♭'],['Fa','Re','1 ♭']];
+  function accOf(d){return d===0?'':d===1?'♯':d===2?'♯♯':d===11?'♭':d===10?'♭♭':''}
+  function spell(li,pc,pat){
+    return pat.map(function(s,i){var l=(li+i)%7,d=(((pc+s)%12-LPC[l])%12+12)%12;return LET[l]+accOf(d)});
+  }
+  function relRow(title,notes,sel){
+    return '<div class="relrow'+(sel?' sel':'')+'"><b>'+title+'</b><span class="notes">'+
+      notes.map(function(n,i){return '<i'+(i===0?' class="r"':'')+'>'+n+'</i>'}).join('')+'</span></div>';
+  }
+  function renderRel(){
+    var key=parseInt(sel.value,10),kn=KEYS.filter(function(k){return k[1]===key})[0][0],li=0,isMin=(mode==='menor'),maj,min;
+    for(var i=0;i<7;i++){if(kn.indexOf(LET[i])===0){li=i;break}}
+    if(isMin){min=spell(li,key,MIN);maj=spell((li+2)%7,(key+3)%12,MAJ)}
+    else{maj=spell(li,key,MAJ);min=spell((li+5)%7,(key+9)%12,MIN)}
+    var majP=[maj[0],maj[1],maj[2],maj[4],maj[5]],minP=[min[0],min[2],min[3],min[4],min[6]];
+    $('#relgrid').innerHTML=
+      '<div class="relcard"><h3>Escala de 7 notas</h3>'+relRow(maj[0]+' mayor',maj,!isMin)+relRow(min[0]+' menor',min,isMin)+'</div>'+
+      '<div class="relcard"><h3>Pentatónica de 5 notas</h3>'+relRow(majP[0]+' mayor',majP,!isMin)+relRow(minP[0]+' menor',minP,isMin)+'</div>';
+    $('#reltip').textContent=maj[0]+' mayor y '+min[0]+' menor usan las mismas notas. Solo cambia dónde descansas: en '+maj[0]+' suena alegre y en '+min[0]+' suena melancólico. La relativa menor está tres trastes abajo de la raíz mayor.';
+  }
+  $('#reltbl').innerHTML='<tr><th>Mayor</th><th>Relativa menor</th><th>Alteraciones</th></tr>'+
+    FIFTHS.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>'}).join('');
+
+  /* ---------- Pista de acompañamiento ---------- */
+  var NOTE_L=['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
+  var PROGS={
+    menor:[
+      {n:'Rock melódico',r:'i · VI · III · VII',ch:[[0,'m'],[8,''],[3,''],[10,'']],tip:'Toda la pentatónica menor queda bien sobre estos acordes. Empieza y termina en la nota raíz.'},
+      {n:'Andaluza',r:'i · VII · VI · V',ch:[[0,'m'],[10,''],[8,''],[7,'']],tip:'Sobre el último acorde, que es mayor, la séptima de la escala choca un poco. Úsala de paso y resuelve en la raíz.'},
+      {n:'Balada',r:'i · iv · VII · III',ch:[[0,'m'],[5,'m'],[10,''],[3,'']],tip:'Ritmo calmado para frases largas con vibrato. Deja huecos entre frase y frase.'}
+    ],
+    mayor:[
+      {n:'Pop rock',r:'I · V · vi · IV',ch:[[0,''],[7,''],[9,'m'],[5,'']],tip:'La pentatónica mayor encaja con todos los acordes. Descansa en la raíz del primer acorde.'},
+      {n:'Clásica',r:'I · vi · IV · V',ch:[[0,''],[9,'m'],[5,''],[7,'']],tip:'Una progresión de balada de los años 50. Prueba frases cortas con bends.'},
+      {n:'Campirana',r:'I · IV · V · I',ch:[[0,''],[5,''],[7,''],[0,'']],tip:'Tres acordes de polka y corrido. Toca frases cortas y deja huecos.'}
+    ]
+  };
+  var pIdx=0,tPlaying=false,tNext=0,tStep=0,tTid=null,tMaster=null,noiseBuf=null,twl=null,chordChips=[];
+  function tKey(){return parseInt(sel.value,10)}
+  function chName(c){return NOTE_L[(tKey()+c[0])%12]+c[1]}
+  function renderTrack(){
+    var list=PROGS[mode];if(pIdx>=list.length)pIdx=0;
+    $('#progs').innerHTML=list.map(function(p,i){return '<button data-p="'+i+'" aria-pressed="'+(i===pIdx)+'">'+p.n+'<small>'+p.r+'</small></button>'}).join('');
+    $('#chords').innerHTML=list[pIdx].ch.map(function(c){return '<div class="chord">'+chName(c)+'</div>'}).join('');
+    chordChips=document.querySelectorAll('#chords .chord');
+    $('#ttip').textContent=list[pIdx].tip;
+    renderRel();
+  }
+  function hl(i){for(var j=0;j<chordChips.length;j++)chordChips[j].classList.toggle('on',i===j)}
+  $('#progs').addEventListener('click',function(e){var b=e.target.closest('[data-p]');if(!b)return;pIdx=parseInt(b.dataset.p,10);tStep=0;renderTrack()});
+  sel.addEventListener('change',renderTrack);
+  $('#m-menor').addEventListener('click',renderTrack);
+  $('#m-mayor').addEventListener('click',renderTrack);
+  function tOut(){audio();if(!tMaster){tMaster=ac.createGain();tMaster.connect(ac.destination)}tMaster.gain.value=parseFloat($('#tvol').value);return tMaster}
+  $('#tvol').addEventListener('input',function(){if(tMaster)tMaster.gain.value=parseFloat(this.value)});
+  function mf(m){return 440*Math.pow(2,(m-69)/12)}
+  function tnote(t,m,len,vol,type,cut){
+    var o=ac.createOscillator(),f=ac.createBiquadFilter(),g=ac.createGain();
+    o.type=type;o.frequency.value=mf(m);f.type='lowpass';f.frequency.value=cut;
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.008);g.gain.exponentialRampToValueAtTime(0.0001,t+len);
+    o.connect(f);f.connect(g);g.connect(tMaster);o.start(t);o.stop(t+len+.03);
+  }
+  function kick(t){
+    var o=ac.createOscillator(),g=ac.createGain();
+    o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(45,t+.12);
+    g.gain.setValueAtTime(0.9,t);g.gain.exponentialRampToValueAtTime(0.0001,t+.22);
+    o.connect(g);g.connect(tMaster);o.start(t);o.stop(t+.25);
+  }
+  function tnoise(t,len,vol,ftype,ffreq){
+    if(!noiseBuf){var n=Math.floor(ac.sampleRate*.3);noiseBuf=ac.createBuffer(1,n,ac.sampleRate);var d=noiseBuf.getChannelData(0);for(var i=0;i<n;i++)d[i]=Math.random()*2-1}
+    var s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();
+    s.buffer=noiseBuf;f.type=ftype;f.frequency.value=ffreq;
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+len);
+    s.connect(f);f.connect(g);g.connect(tMaster);s.start(t);s.stop(t+len+.02);
+  }
+  function tSched(){
+    var p=PROGS[mode][pIdx],key=tKey(),drums=$('#tdrums').checked,bass=$('#tbass').checked;
+    while(tNext<ac.currentTime+.12){
+      var s=tStep%8,bar=Math.floor(tStep/8)%4,c=p.ch[bar],pc=(key+c[0])%12,third=(c[1]==='m')?3:4;
+      var bl=60/bpm,rc=40+((pc+8)%12),rb=28+((pc+8)%12),t=tNext;
+      if(s===0||s===4){[0,7,12,12+third,19].forEach(function(iv,i){tnote(t+i*.012,rc+iv,bl*1.9,.07,'sawtooth',1900)})}
+      if(bass){
+        if(s===0||s===4)tnote(t,rb,bl*.9,.4,'triangle',900);
+        if(s===3)tnote(t,rb,bl*.4,.28,'triangle',900);
+        if(s===6)tnote(t,rb+7,bl*.4,.28,'triangle',900);
+      }
+      if(drums){
+        if(s===0||s===4)kick(t);
+        if(s===2||s===6){tnoise(t,.16,.5,'highpass',1500);tnote(t,55,.1,.3,'triangle',2000)}
+        tnoise(t,.04,(s%2===0)?.22:.12,'highpass',7500);
+      }
+      if(s===0)(function(b,tt){setTimeout(function(){if(tPlaying)hl(b)},Math.max(0,(tt-ac.currentTime)*1000))})(bar,t);
+      tNext+=30/bpm;tStep++;
+    }
+  }
+  function tStart(){
+    if(playing)toggle();
+    tOut();tNext=ac.currentTime+.08;tStep=0;tPlaying=true;tTid=setInterval(tSched,25);
+    $('#tplay').textContent='Detener pista';
+    try{if(navigator.wakeLock)navigator.wakeLock.request('screen').then(function(l){twl=l}).catch(function(){})}catch(e){}
+  }
+  function tStop(){
+    clearInterval(tTid);tPlaying=false;hl(-1);$('#tplay').textContent='Tocar pista';
+    try{if(twl){twl.release();twl=null}}catch(e){}
+  }
+  $('#tplay').onclick=function(){if(tPlaying)tStop();else tStart()};
+  renderTrack();
+
+  /* ---------- Escuchar: notas de guitarra ---------- */
+  var OPENM={E:40,A:45,D:50,G:55,B:59,e:64};
+  var pBus=null,pTm=null,pBtn=null;
+  function parseTok(s){
+    var m=/^([EADGBe])(\d+)(?:>(\d+))?([~*]?)$/.exec(s);if(!m)return null;
+    return {m:OPENM[m[1]]+parseInt(m[2],10),to:m[3]?OPENM[m[1]]+parseInt(m[3],10):null,mark:m[4]};
+  }
+  function pluck(t,m,len,bendTo,vib){
+    var o=ac.createOscillator(),o2=ac.createOscillator(),f=ac.createBiquadFilter(),g=ac.createGain(),ring=len*1.5+.25;
+    o.type='sawtooth';o2.type='triangle';
+    var f0=mf(m);o.frequency.setValueAtTime(f0,t);o2.frequency.setValueAtTime(f0,t);
+    if(bendTo!=null){
+      var f1=mf(bendTo);
+      o.frequency.setValueAtTime(f0,t+len*.2);o.frequency.linearRampToValueAtTime(f1,t+len*.55);
+      o2.frequency.setValueAtTime(f0,t+len*.2);o2.frequency.linearRampToValueAtTime(f1,t+len*.55);
+    }
+    var lfo=null;
+    if(vib){
+      lfo=ac.createOscillator();var lg=ac.createGain();lfo.frequency.value=5.5;lg.gain.value=30;
+      lfo.connect(lg);lg.connect(o.detune);lg.connect(o2.detune);lfo.start(t+len*.3);lfo.stop(t+ring);
+    }
+    f.type='lowpass';f.frequency.setValueAtTime(3600,t);f.frequency.exponentialRampToValueAtTime(700,t+ring);
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(.2,t+.004);g.gain.exponentialRampToValueAtTime(0.0001,t+ring);
+    o.connect(f);o2.connect(f);f.connect(g);g.connect(pBus);
+    o.start(t);o2.start(t);o.stop(t+ring+.02);o2.stop(t+ring+.02);
+  }
+  function stopPlay(){
+    if(pBus){try{pBus.disconnect()}catch(e){}pBus=null}
+    clearTimeout(pTm);
+    if(pBtn){pBtn.textContent='▶ Escuchar';pBtn=null}
+  }
+  function playSeq(str,btn){
+    var same=(btn===pBtn);stopPlay();if(same||!str)return;
+    audio();pBus=ac.createGain();pBus.gain.value=.9;pBus.connect(ac.destination);
+    var step=30/bpm,t=ac.currentTime+.08;
+    str.split(' ').forEach(function(s){
+      var p=parseTok(s);if(!p)return;
+      var long=(p.mark!==''||p.to!==null),len=long?step*4:step;
+      pluck(t,p.m,len,p.to,p.mark==='~');t+=len;
+    });
+    pBtn=btn;btn.textContent='■ Detener';
+    pTm=setTimeout(stopPlay,(t-ac.currentTime)*1000+500);
+  }
+  function posTokens(n){
+    var p=lastList.filter(function(x){return x.n===n})[0];if(!p)return '';
+    var a=[];p.fr.forEach(function(arr,c){arr.slice().sort(function(x,y){return x-y}).forEach(function(f){a.push(STRN[c]+f)})});
+    return rev(a.join(' '));
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('[data-play]');
+    if(b){playSeq(LISTEN[b.dataset.play],b);return}
+    var q=e.target.closest('[data-pos]');
+    if(q)playSeq(posTokens(parseInt(q.dataset.pos,10)),q);
+  });
+  $('#boxes').addEventListener('click',function(){});
+
+  /* ---------- Cronómetro ---------- */
+  var tIv=null,tEnd=0;
+  function fmt(ms){var s=Math.max(0,Math.ceil(ms/1000)),m=Math.floor(s/60);return (m<10?'0':'')+m+':'+(s%60<10?'0':'')+(s%60)}
+  function stopTimer(){clearInterval(tIv);tIv=null;$('#timer').classList.remove('show')}
+  function startTimer(min,label){
+    audio();stopTimer();tEnd=Date.now()+min*60000;
+    $('#tlabel').textContent=label;$('#tleft').textContent=fmt(min*60000);$('#timer').classList.add('show');
+    tIv=setInterval(function(){
+      var left=tEnd-Date.now();$('#tleft').textContent=fmt(left);
+      if(left<=0){
+        stopTimer();var t=ac.currentTime;
+        tone(t,880,.25,.6);tone(t+.35,880,.25,.6);tone(t+.7,1320,.4,.6);
+        try{if(navigator.vibrate)navigator.vibrate([200,100,200])}catch(e){}
+      }
+    },250);
+  }
+  $('#timer').onclick=stopTimer;
+})();
 </script>
-
-</body>
 </html>
